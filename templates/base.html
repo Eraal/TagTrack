@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="{{ url_for('static', filename='js/script.js') }}"
+      defer
+    ></script>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h1 class="sidebar-title">TagTrack</h1>
+        <ul class="sidebar-menu">
+          <li>
+            <img
+              src="{{ url_for('static', filename='images/dashboard.png') }}"
+              alt="Dashboard Icon"
+            />
+            <span>Dashboard</span>
+          </li>
+          <li>
+            <img
+              src="{{ url_for('static', filename='images/categories.png') }}"
+              alt="Categories Icon"
+            />
+            <span>Categories</span>
+          </li>
+          <li class="toggle-items">
+            <img
+              src="{{ url_for('static', filename='images/categories.png') }}"
+              alt="Items Icon"
+            />
+            <span>Items</span>
+          </li>
+
+          <!-- SUBMENU HIDDEN -->
+          <ul class="submenu hidden">
+            <li>
+              <img
+              src="{{ url_for('static', filename='images/listentry.png') }}"
+              alt="Admin Info Icon"
+            />
+              List Entry Item</li>
+            <li>
+              <img
+              src="{{ url_for('static', filename='images/listtag.png') }}"
+              alt="Admin Info Icon"
+            />
+              List Tag Item</li>
+            <li>
+              <img
+              src="{{ url_for('static', filename='images/listlost.png') }}"
+              alt="Admin Info Icon"
+            />
+              List Total Lost Item</li>
+            <li>
+              <img
+              src="{{ url_for('static', filename='images/listfound.png') }}"
+              alt="Admin Info Icon"
+            />
+              List Total Found Item</li>
+          </ul>
+        </ul>
+
+<div class="information">
+     <ul>
+          <li class="admin-information">
+            <img
+              src="{{ url_for('static', filename='images/person.png') }}"
+              alt="Admin Info Icon"
+            />
+            <span>Admin Information</span>
+          </li>
+
+
+          <li class="system-information">
+            <img
+              src="{{ url_for('static', filename='images/system.png') }}"
+              alt="System Info Icon"
+            />
+            <span>System Information</span>
+          </li>
+        </ul>
+      </div>
+
+        <div class="logout">
+          <img
+            src="{{ url_for('static', filename='images/a.png') }}"
+            alt="Logout Icon"
+          />
+          <span>Logout</span>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">{% block content %}{% endblock %}</div>
+    </div>
+  </body>
+</html>

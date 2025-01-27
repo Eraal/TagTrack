@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TagTrack{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <div class="header">
+    <h2>Dashboard</h2>
+    
+    <h2>Admin</h2>
+  </div>
+
+  <!-- Dashboard Cards -->
+  <div class="dashboard-cards">
+    <div class="card">
+      <div class="card-icon">
+        <img src="{{ url_for('static', filename='images/itementry.png') }}" alt="Item Entry Icon">
+      </div>
+      <div class="card-content">
+        <div class="card-title">ITEM ENTRY / Active</div>
+        <div class="card-value">14</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <img src="{{ url_for('static', filename='images/totaltagitems.png') }}" alt="Total Tag Items Icon">
+      </div>
+      <div class="card-content">
+        <div class="card-title">TOTAL TAG ITEMS</div>
+        <div class="card-value">27</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <img src="{{ url_for('static', filename='images/totalitemlost.png') }}" alt="Total Lost Items Icon">
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="card-title">TOTAL ITEM LOST</div>
+          <div class="filter-dropdown">
+            <label for="lost-filter">Filtered:</label>
+            <select id="lost-filter">
+              <option value="today">Today</option>
+              <option value="week">By Week</option>
+              <option value="month">By Month</option>
+              <option value="year">By Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-value">10.5</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <img src="{{ url_for('static', filename='images/totalfounditem.png') }}" alt="Total Found Items Icon">
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="card-title">TOTAL ITEM FOUND</div>
+          <div class="filter-dropdown">
+            <label for="found-filter">Filtered:</label>
+            <select id="found-filter">
+              <option value="today">Today</option>
+              <option value="week">By Week</option>
+              <option value="month">By Month</option>
+              <option value="year">By Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-value">86</div>
+      </div>
+    </div>
+    
+  </div>
+{% endblock %}
