@@ -1,16 +1,24 @@
 System Progress (10% - In Progress)
 
-Backend Database Creation & Connection: Completed (100%)
-Dashboard UI: Completed (100%)
+    Backend Database Creation & Connection: Completed (100%)
+    Dashboard UI: Completed (100%)
 
-Categories UI: Not Started (0%)
-Items UI (Entry): Not Started (0%)
-List Tags Item UI: Not Started (0%)
-List Total Lost Items UI: Not Started (0%)
-List Total Found Items UI: Not Started (0%)
+  Categories UI: Not Started (0%)
+  Items UI (Entry): Not Started (0%)
+  List Tags Item UI: Not Started (0%)
+  List Total Lost Items UI: Not Started (0%)
+  List Total Found Items UI: Not Started (0%)
 
-Working on Categories UI
+!!!!----- Must ------- !!!!!
+
+Need Virtual Environment to Handle Data
 
 Downloaded Database - PostgreSQL 
 pgAdmin 4
 
+
+
+!!!! ----- San tumigil ----- !!!!!
+
+Working on Categories UI 
+Kape Muna
