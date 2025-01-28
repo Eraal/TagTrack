@@ -2,7 +2,9 @@ System Progress (10% - In Progress)
 
    
  Week 1 Day 1 - Dashboard UI: Completed (100%)
- Week 1 Day 2 - Backend Database Creation & Connection: Completed (100%)
+ Week 1 Day 2 - Missed (Tinamad)
+ Week 1 Day 3 - Missed (Tinamad)
+ Week 1 Day 4 - Backend Database Creation & Connection: Completed (100%)
 
   Categories UI: Not Started (0%)
   Items UI (Entry): Not Started (0%)
