@@ -6,32 +6,34 @@
   <!-- Header -->
   <div class="header">
     <h2>Dashboard</h2>
-    
     <h2>Admin</h2>
   </div>
 
   <!-- Dashboard Cards -->
   <div class="dashboard-cards">
+    <!-- ITEM ENTRY / Active -->
     <div class="card">
       <div class="card-icon">
         <img src="{{ url_for('static', filename='images/itementry.png') }}" alt="Item Entry Icon">
       </div>
       <div class="card-content">
         <div class="card-title">ITEM ENTRY / Active</div>
-        <div class="card-value">14</div>
+        <div class="card-value">{{ total_items_active }}</div>  <!-- Dynamic value -->
       </div>
     </div>
 
+    <!-- TOTAL TAG ITEMS -->
     <div class="card">
       <div class="card-icon">
         <img src="{{ url_for('static', filename='images/totaltagitems.png') }}" alt="Total Tag Items Icon">
       </div>
       <div class="card-content">
         <div class="card-title">TOTAL TAG ITEMS</div>
-        <div class="card-value">27</div>
+        <div class="card-value">{{ total_tagged_items }}</div>  <!-- Dynamic value -->
       </div>
     </div>
 
+    <!-- TOTAL ITEM LOST -->
     <div class="card">
       <div class="card-icon">
         <img src="{{ url_for('static', filename='images/totalitemlost.png') }}" alt="Total Lost Items Icon">
@@ -40,19 +42,22 @@
         <div class="card-header">
           <div class="card-title">TOTAL ITEM LOST</div>
           <div class="filter-dropdown">
-            <label for="lost-filter">Filtered:</label>
-            <select id="lost-filter">
-              <option value="today">Today</option>
-              <option value="week">By Week</option>
-              <option value="month">By Month</option>
-              <option value="year">By Year</option>
-            </select>
+            <form id="lost-filter-form" method="GET" action="{{ url_for('dashboard') }}">
+              <label for="lost-filter">Filtered:</label>
+              <select id="lost-filter" name="filter" onchange="this.form.submit()">
+                <option value="today" {% if filter_type == 'today' %}selected{% endif %}>Today</option>
+                <option value="week" {% if filter_type == 'week' %}selected{% endif %}>By Week</option>
+                <option value="month" {% if filter_type == 'month' %}selected{% endif %}>By Month</option>
+                <option value="year" {% if filter_type == 'year' %}selected{% endif %}>By Year</option>
+              </select>
+            </form>
           </div>
         </div>
-        <div class="card-value">10.5</div>
+        <div class="card-value">{{ total_items_lost }}</div>  <!-- Dynamic value -->
       </div>
     </div>
 
+    <!-- TOTAL ITEM FOUND -->
     <div class="card">
       <div class="card-icon">
         <img src="{{ url_for('static', filename='images/totalfounditem.png') }}" alt="Total Found Items Icon">
@@ -70,9 +75,8 @@
             </select>
           </div>
         </div>
-        <div class="card-value">86</div>
+        <div class="card-value">{{ total_items_found }}</div>  <!-- Dynamic value -->
       </div>
     </div>
-    
   </div>
 {% endblock %}
