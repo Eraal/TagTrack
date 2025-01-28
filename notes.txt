@@ -11,4 +11,6 @@ List Total Found Items UI: Not Started (0%)
 
 Working on Categories UI
 
+Downloaded Database - PostgreSQL 
+pgAdmin 4
 
