@@ -1,4 +1,4 @@
-![TagTrack - dashboard](https://github.com/user-attachments/assets/69af5190-d9fe-4029-a443-14beaf728f25)# System Progress
+# System Progress
 
 ## Current Progress: 20% - In Progress
 
