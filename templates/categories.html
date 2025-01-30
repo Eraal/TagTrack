@@ -1,0 +1,317 @@
+{% extends "base.html" %} {% block title %}Categories - TagTrack{% endblock %}
+{% block content %}
+<style>
+  .container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 20px;
+    background: #d9d9d9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-bar {
+    padding: 8px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .create-btn {
+    background: #4a47a3;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background: #ddd;
+    cursor: pointer;
+  }
+
+  .status-btn {
+    background: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  .edit-btn {
+    background: #ccc;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: #fff;
+    padding: 25px;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 22px;
+    color: #555;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .create-btn {
+    background: #4a47a3;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+
+  .create-btn:hover {
+    background: #383585;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+
+    .header {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-bar {
+      width: 100%;
+    }
+
+    table {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<div class="header">
+  <h2>Categories</h2>
+  <h2>Admin</h2>
+</div>
+
+<div class="container">
+  <div class="header">
+    <input type="text" class="search-bar" id="search" placeholder="Search..." />
+    <button class="create-btn">Create New</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th onclick="sortTable(1)">Name</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="categoryTable">
+      <!-- Table rows will be generated dynamically -->
+    </tbody>
+  </table>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Create New Category</h2>
+    <form id="createCategoryForm">
+      <label for="categoryName">Name:</label>
+      <input type="text" id="categoryName" name="categoryName" required />
+      <label for="categoryDescription">Description:</label>
+      <input
+        type="text"
+        id="categoryDescription"
+        name="categoryDescription"
+        required
+      />
+      <button type="submit" class="create-btn">Submit</button>
+    </form>
+  </div>
+  
+
+  <script>
+    let categories = []; // Global variable to store fetched categories
+
+    async function fetchCategories() {
+      const response = await fetch("/get_categories");
+      categories = await response.json(); // Correctly update global categories
+      renderTable(categories);
+    }
+
+    function renderTable(data) {
+      const table = document.getElementById("categoryTable");
+      table.innerHTML = "";
+      data.forEach((category, index) => {
+        table.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${category.name}</td>
+                <td>${category.description}</td>
+                <td><button class="status-btn">${category.status}</button></td>
+                <td><button class="edit-btn">Edit</button></td>
+            </tr>
+        `;
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+      const filtered = categories.filter((c) =>
+        c.name.toLowerCase().includes(searchTerm)
+      );
+      renderTable(filtered); // Render filtered results
+    });
+
+    document
+      .getElementById("createCategoryForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const name = document.getElementById("categoryName").value;
+        const description = document.getElementById(
+          "categoryDescription"
+        ).value;
+
+        const response = await fetch("/add_category", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, description }),
+        });
+
+        if (response.ok) {
+          fetchCategories();
+          document.getElementById("myModal").style.display = "none";
+          this.reset();
+        }
+      });
+
+    fetchCategories();
+
+    // Get modal element
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = document.getElementById("myModal");
+      const createBtn = document.querySelector(".create-btn");
+      const closeBtn = document.querySelector(".close");
+
+      if (modal) {
+        modal.style.display = "none"; // Ensure modal is hidden when page loads
+      }
+
+      // Open modal only when 'Create New' is clicked
+      if (createBtn) {
+        createBtn.onclick = function () {
+          modal.style.display = "flex"; // Use flex to center modal
+        };
+      }
+
+      // Close modal when 'X' is clicked
+      if (closeBtn) {
+        closeBtn.onclick = function () {
+          modal.style.display = "none";
+        };
+      }
+
+      // Close modal if clicked outside
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    });
+
+    document
+      .getElementById("createCategoryForm")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const name = document.getElementById("categoryName").value;
+        const description = document.getElementById(
+          "categoryDescription"
+        ).value;
+        categories.push({
+          name: name,
+          description: description,
+          status: "Active",
+        });
+        renderTable();
+        modal.style.display = "none";
+
+        // Clear form fields
+        this.reset();
+      });
+
+    renderTable();
+  </script>
+
+  {% endblock %}
+</div>

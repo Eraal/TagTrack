@@ -25,19 +25,20 @@
         <h1 class="sidebar-title">TagTrack</h1>
         <ul class="sidebar-menu">
           <li>
-            <img
-              src="{{ url_for('static', filename='images/dashboard.png') }}"
-              alt="Dashboard Icon"
-            />
-            <span>Dashboard</span>
+            <a href="{{ url_for('dashboard') }}">
+              <img src="{{ url_for('static', filename='images/dashboard.png') }}" alt="Dashboard Icon" />     
+          </a> <!-- Blue Not Fixed tangina -->
+            <span>Dashboard</span>     
           </li>
+
           <li>
-            <img
-              src="{{ url_for('static', filename='images/categories.png') }}"
-              alt="Categories Icon"
-            />
-            <span>Categories</span>
-          </li>
+            <a href="{{ url_for('categories') }}">
+                <img src="{{ url_for('static', filename='images/categories.png') }}" alt="Categories Icon" />
+              </a><!-- Blue Not Fixed tangina -->
+                <span>Categories</span>
+            
+        </li>
+        
           <li class="toggle-items">
             <img
               src="{{ url_for('static', filename='images/categories.png') }}"
