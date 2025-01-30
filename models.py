@@ -4,6 +4,8 @@ class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(255))  # Added description field
+    status = db.Column(db.String(20), default="Active")  # Added status field
 
 
 # Locations Table
