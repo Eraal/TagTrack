@@ -7,16 +7,24 @@
 - **Week 1 Day 2**: Missed (Tinamad)
 - **Week 1 Day 3**: Missed (Tinamad)
 - **Week 1 Day 4**: Backend Database Creation & Connection - **Completed** (100%)
-  
+
+  ### Dashboard
 ![TagTrack - dashboard](https://github.com/user-attachments/assets/8e891571-9857-4fda-97c6-6c47d9c7e762)
+
+  ### Dashboard: Drop Down Menu
 ![TagTrack - dashboard1](https://github.com/user-attachments/assets/f344024a-16d4-4561-a3ff-57ec5a023807)
 
 ### In Progress:
 - **Week 1 Day 5**: Started **Categories.html** UI
 - **Week 1 Day 6**: Backend Categories with Create New Category, Search Function, and Edit Category - **80% Completed**
-  
+
+   ### Categories 
 ![CategoriesUI](https://github.com/user-attachments/assets/7084f957-0b7a-4779-abd7-836fdb9ca8b8)
+
+   ### Categories : Create New Category
 ![CreateCategories](https://github.com/user-attachments/assets/aaf2d865-5723-471f-849a-3f2566ab5e99)
+
+   ### Categories : Search Function
 ![SearchCategories](https://github.com/user-attachments/assets/4772bb91-87d3-4851-84ff-c000219817a9)
 
 
