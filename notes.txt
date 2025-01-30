@@ -1,22 +1,22 @@
-System Progress (10% - In Progress)
+System Progress (20% - In Progress)
 
    
  Week 1 Day 1 - Dashboard UI: Completed (100%)
  Week 1 Day 2 - Missed (Tinamad)
  Week 1 Day 3 - Missed (Tinamad)
  Week 1 Day 4 - Backend Database Creation & Connection: Completed (100%)
- Week 1 Day 5 - Missed (Antok)
+ Week 1 Day 5 - Started Categories.html UI
+ Week 1 Day 6 - Backend Categories with Create New Category, search Function and edit Category (80%)
 
-  Categories UI: Not Started (0%)
   Items UI (Entry): Not Started (0%)
   List Tags Item UI: Not Started (0%)
   List Total Lost Items UI: Not Started (0%)
   List Total Found Items UI: Not Started (0%)
+  User/Student Interface: Not Started (0%)
 
 !!!!----- Must ------- !!!!!
 
 Need Virtual Environment to Handle Data
-
 Downloaded Database - PostgreSQL 
 pgAdmin 4
 
@@ -24,5 +24,6 @@ pgAdmin 4
 
 !!!! ----- San tumigil ----- !!!!!
 
-Working on Categories UI 
-Kape Muna
+Edit Category no Function
+
+
