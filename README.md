@@ -5,7 +5,7 @@
 ### Completed Tasks:
 - **Week 1 Day 1**: Dashboard UI - **Completed** (100%)
 - **Week 1 Day 2**: Missed (Tinamad)
-- **Week 1 Day 2**: Missed (Tinamad)
+- **Week 1 Day 3**: Missed (Tinamad)
 - **Week 1 Day 4**: Backend Database Creation & Connection - **Completed** (100%)
   
 ![TagTrack - dashboard](https://github.com/user-attachments/assets/8e891571-9857-4fda-97c6-6c47d9c7e762)
