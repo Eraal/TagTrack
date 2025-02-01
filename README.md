@@ -17,6 +17,7 @@
 ### In Progress:
 - **Week 1 Day 5**: Started **Categories.html** UI
 - **Week 1 Day 6**: Backend Categories with Create New Category, Search Function, and Edit Category - **80% Completed**
+- **Week 1 Day 7**: Pahinga
 
    ### Categories 
 ![CategoriesUI](https://github.com/user-attachments/assets/7084f957-0b7a-4779-abd7-836fdb9ca8b8)
