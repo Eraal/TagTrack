@@ -50,11 +50,12 @@
           <!-- SUBMENU HIDDEN -->
           <ul class="submenu hidden">
             <li>
-              <img
-              src="{{ url_for('static', filename='images/listentry.png') }}"
-              alt="Admin Info Icon"
-            />
-              List Entry Item</li>
+              <a href="{{ url_for('list_entry_item_page') }}">
+                <img src="{{ url_for('static', filename='images/categories.png') }}" alt="Categories Icon" />
+              </a><!-- Blue Not Fixed tangina -->
+                <span>List Entry Items</span>
+            
+            </li>
             <li>
               <img
               src="{{ url_for('static', filename='images/listtag.png') }}"

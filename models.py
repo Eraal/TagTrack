@@ -1,11 +1,13 @@
-from extensions import db  # Import db from extensions.py
+from extensions import db 
 
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(255))  # Added description field
-    status = db.Column(db.String(20), default="Active")  # Added status field
+    description = db.Column(db.String(255)) 
+    status = db.Column(db.String(20), default="Active")  
+    items = db.relationship('Item', back_populates="category", lazy=True)
+
 
 
 # Locations Table
@@ -13,6 +15,8 @@ class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    items = db.relationship('Item', back_populates="location", lazy=True)
+
 
 
 # Items Table
@@ -25,8 +29,12 @@ class Item(db.Model):
     date_reported = db.Column(db.Date, nullable=False)
     image_file = db.Column(db.String(255))
     rfid_tag = db.Column(db.String(255))
-    is_tagged = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(50), nullable=False)
+
+    category = db.relationship('Category', back_populates="items")
+    location = db.relationship('Location', back_populates="items")
+
+ 
 
 
 # Users Table

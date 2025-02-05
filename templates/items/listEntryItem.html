@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .item-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .item-card:hover {
+        transform: scale(1.02);
+    }
+
+    .item-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .item-info p {
+        margin: 8px 0;
+    }
+
+    .status.unclaimed {
+        color: red;
+        font-weight: bold;
+    }
+
+    .status.claimed {
+        color: green;
+        font-weight: bold;
+    }
+
+    .add-item-btn {
+        background: navy;
+        color: white;
+        padding: 12px 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s;
+    }
+
+    .add-item-btn:hover {
+        background: darkblue;
+    }
+
+    /* MODAL STYLING */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: red;
+    }
+
+    .modal form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal form input, 
+    .modal form select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .modal form button {
+        background: navy;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .modal form button:hover {
+        background: darkblue;
+    }
+
+    /* Updated Item Card Styles */
+.item-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Soft shadow */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.item-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+/* Item Image */
+.item-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.item-card img:hover {
+    opacity: 0.9; /* Slight fade on hover */
+}
+
+/* Item Information */
+.item-info {
+    padding: 10px;
+    width: 100%;
+}
+
+.item-info p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #444; /* Soft text color */
+}
+
+.item-info strong {
+    color: #222;
+}
+
+/* Status Styling */
+.status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status.unclaimed {
+    background-color: #ffdddd;
+    color: #c00;
+}
+
+.status.claimed {
+    background-color: #ddffdd;
+    color: #080;
+}
+
+/* Edit Button */
+.edit-btn {
+    background: navy;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out;
+    margin-top: 10px;
+}
+
+.edit-btn:hover {
+    background: darkblue;
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+</style>
+
+<div class="header">
+    <h2>Categories</h2>
+    <h2>Admin</h2>
+  </div>
+
+<div class="container">
+    <h2 class="page-title">Categories - Admin</h2>
+
+    <!-- Search and Filters -->
+    <div class="filter-bar">
+        <input type="text" id="search" placeholder="Search..." onkeyup="filterItems()">
+        <select id="filter-status" onchange="filterItems()">
+            <option value="">By Status</option>
+            <option value="Unclaimed">Unclaimed</option>
+            <option value="Claimed">Claimed</option>
+        </select>
+        <button class="add-item-btn" onclick="openAddItemModal()">Add New Item</button>
+    </div>
+
+    <!-- Items Grid -->
+    <div id="items-container" class="items-grid">
+        <!-- Cards will be inserted dynamically -->
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div id="addItemModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddItemModal()">&times;</span>
+        <h2>Add New Item</h2>
+        <form id="addItemForm" enctype="multipart/form-data">
+            <label>Category:</label>
+<select id="category" required>
+    <option value="">Select Category</option>
+    {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+    {% endfor %}
+</select>
+
+<label>Location:</label>
+<select id="location" required>
+    <option value="">Select Location</option>
+    {% for loc in locations %}
+        <option value="{{ loc.id }}">{{ loc.name }}</option>
+    {% endfor %}
+</select>
+
+            
+            <input type="text" id="description" placeholder="Description" required>
+            
+            <input type="date" id="date" required>
+            
+            <label>Status:</label>
+            <select id="status">
+                <option value="Unclaimed">Unclaimed</option>
+                <option value="Claimed">Claimed</option>
+            </select>
+            
+            <!-- Add RFID Tag field -->
+            <input type="text" id="rfid_tag" placeholder="RFID Tag">
+            
+            <!-- Add file input for image upload -->
+            <label>Upload Image:</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            
+            <button type="submit">Create Entry</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    fetchItems();
+    fetchCategories(); // Load categories on page load
+});
+
+
+
+async function fetchItems() {
+    try {
+        const response = await fetch("/api/items");
+        if (!response.ok) {
+            throw new Error(`Failed to fetch items: ${response.statusText}`);
+        }
+        const items = await response.json();
+        console.log("Fetched items:", items);  // Debugging: Check if items are fetched
+        renderItems(items);
+    } catch (error) {
+        console.error("Error fetching items:", error);
+    }
+}
+
+
+async function fetchCategories() {
+    try {
+        const response = await fetch("/api/categories");
+        if (!response.ok) {
+            throw new Error(`Failed to fetch categories: ${response.statusText}`);
+        }
+        const categories = await response.json();
+        console.log("Fetched categories:", categories);  // Debugging: Print fetched categories
+
+        const categoryDropdown = document.getElementById("category");
+        categoryDropdown.innerHTML = '<option value="">Select Category</option>'; // Reset options
+
+        categories.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat.id;
+            option.textContent = cat.name;
+            categoryDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+}
+// Fetch Location
+async function fetchLocations() {
+    try {
+        const response = await fetch("/api/locations");
+        if (!response.ok) {
+            throw new Error(`Failed to fetch locations: ${response.statusText}`);
+        }
+        const locations = await response.json();
+        console.log("Fetched locations:", locations);  // Debugging
+
+        const locationDropdown = document.getElementById("location");
+        locationDropdown.innerHTML = '<option value="">Select Location</option>'; // Reset options
+
+        locations.forEach(loc => {
+            let option = document.createElement("option");
+            option.value = loc.id;
+            option.textContent = loc.name;
+            locationDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching locations:", error);
+    }
+}
+
+// Call fetchLocations() when the modal opens
+function openAddItemModal() {
+    console.log("Modal opened");  // Debugging
+    document.getElementById("addItemModal").style.display = "flex";
+    fetchCategories();
+    fetchLocations();  // Fetch locations dynamically
+}
+
+function renderItems(items) {
+    const container = document.getElementById("items-container");
+    container.innerHTML = ""; // Clear existing items
+
+    if (items.length === 0) {
+        container.innerHTML = "<p>No items found.</p>";
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement("div");
+        card.classList.add("item-card");
+        card.innerHTML = `
+            <img src="${item.image_file ? '/uploads/' + item.image_file : 'default.jpg'}" alt="Item Image">
+            <div class="item-info">
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Description:</strong> ${item.description}</p>
+                <p><strong>Location:</strong> ${item.location}</p>
+                <p><strong>Date Reported:</strong> ${item.date_reported}</p>
+                <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
+                <p><strong>RFID Tag:</strong> ${item.rfid_tag || "Not Tagged"}</p>
+            </div>
+            <button class="edit-btn">Edit Details</button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+    function filterItems() {
+        let search = document.getElementById("search").value.toLowerCase();
+        let status = document.getElementById("filter-status").value;
+
+        fetch("/api/items")
+            .then(response => response.json())
+            .then(items => {
+                let filteredItems = items.filter(item => {
+                    return (
+                        (search === "" || item.description.toLowerCase().includes(search)) &&
+                        (status === "" || item.status === status)
+                    );
+                });
+                renderItems(filteredItems);
+            });
+    }
+
+    // Open Modal
+    function openAddItemModal() {
+    console.log("Modal opened");  // Debugging
+    document.getElementById("addItemModal").style.display = "flex";
+    fetchCategories();  
+}
+
+// Close Modal
+function closeAddItemModal() {
+    document.getElementById("addItemModal").style.display = "none";
+}
+
+document.getElementById("addItemForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append("category_id", parseInt(document.getElementById("category").value));  
+    formData.append("description", document.getElementById("description").value);
+    formData.append("location_id", parseInt(document.getElementById("location").value));  
+    formData.append("date_reported", document.getElementById("date").value);
+    formData.append("status", document.getElementById("status").value);
+    formData.append("rfid_tag", document.getElementById("rfid_tag").value);
+    formData.append("image", document.getElementById("image").files[0]);
+
+    try {
+        const response = await fetch("/api/items", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (response.ok) {
+            alert("Item added successfully!");
+            closeAddItemModal();
+            console.log("Fetching items after adding...");
+            fetchItems();  // Ensure this runs
+        } else {
+            const error = await response.json();
+            alert(`Failed to add item: ${error.error}`);
+        }
+    } catch (error) {
+        console.error("Error adding item:", error);
+        alert("An error occurred while adding the item.");
+    }
+});
+
+// Handle form submission
+function renderItems(items) {
+    const container = document.getElementById("items-container");
+    container.innerHTML = ""; 
+
+    if (items.length === 0) {
+        container.innerHTML = "<p>No items found.</p>";
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement("div");
+        card.classList.add("item-card");
+        card.innerHTML = `
+            <img src="/uploads/${item.image_file}" onerror="this.src='default.jpg'" alt="Item Image">
+            <div class="item-info">
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Description:</strong> ${item.description}</p>
+                <p><strong>Location:</strong> ${item.location}</p>
+                <p><strong>Date Reported:</strong> ${item.date_reported}</p>
+                <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
+                <p><strong>RFID Tag:</strong> ${item.rfid_tag || "Not Tagged"}</p>
+            </div>
+            <button class="edit-btn">Edit Details</button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+
+</script>
+
+{% endblock %}
