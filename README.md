@@ -1,6 +1,6 @@
 # System Progress
 
-## Current Progress: 20% - In Progress
+## Current Progress: 23% - In Progress
 
 ### Completed Tasks:
 - **Week 1 Day 1**: Dashboard UI - **Completed** (100%)
@@ -28,9 +28,17 @@
    ### Categories : Search Function
 ![SearchCategories](https://github.com/user-attachments/assets/4772bb91-87d3-4851-84ff-c000219817a9)
 
+- **Week 2 Day 1-3**: Adding Items Working, Edit Detail Not Working, UI is still not FIX. - **60% Completed**
+
+   ### Items > List Entry Items  
+![image](https://github.com/user-attachments/assets/82b38c36-ab61-4f7b-a844-9128e32fc206)
+
+  ### Items > List Entry Items : adding Items Function
+
+![image](https://github.com/user-attachments/assets/3bfd2268-3bac-4dec-a4e6-e2e565da1858)
+
 
 ### Not Started:
-- **Items UI (Entry)** - **0%**
 - **List Tags Item UI** - **0%**
 - **List Total Lost Items UI** - **0%**
 - **List Total Found Items UI** - **0%**
