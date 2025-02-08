@@ -37,7 +37,7 @@
   ### Items > List Entry Items : adding Items Function
 ![image](https://github.com/user-attachments/assets/3bfd2268-3bac-4dec-a4e6-e2e565da1858)
 
-## **Week 2 Day 4-6**: - **100% Completed**
+## **Week 2 Day 4-6**: All filter are Button Workings Database Fetching - **100% Completed**
 
  ### Items > List Tag Items - **50% Completed**
 ![image](https://github.com/user-attachments/assets/2c0c185e-194d-4e33-af60-d2630c4c55ca)
