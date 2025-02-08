@@ -9,10 +9,11 @@
 - **Week 1 Day 4**: Backend Database Creation & Connection - **Completed** (100%)
 
   ### Dashboard
-![TagTrack - dashboard](https://github.com/user-attachments/assets/8e891571-9857-4fda-97c6-6c47d9c7e762)
+![image](https://github.com/user-attachments/assets/e3613f0f-ded4-44e0-b844-5f5d4c74e047)
 
   ### Dashboard: Drop Down Menu
-![TagTrack - dashboard1](https://github.com/user-attachments/assets/f344024a-16d4-4561-a3ff-57ec5a023807)
+![image](https://github.com/user-attachments/assets/e195088f-7c61-4204-add9-614b91fffa06)
+
 
 ### In Progress:
 - **Week 1 Day 5**: Started **Categories.html** UI
@@ -39,6 +40,11 @@
 
 - **Week 2 Day 4-6**: - **100% Completed**
 
+ ### Items > List Tag Items - **50% Completed**
+
+![image](https://github.com/user-attachments/assets/2c0c185e-194d-4e33-af60-d2630c4c55ca)
+
+
   ### Items > List Total Lost Items - **100% Completed**
 
 ![image](https://github.com/user-attachments/assets/72e3344e-bdd8-440b-976d-5b3a20f2075a)
@@ -64,10 +70,13 @@
 
 #### **Pending Issues:**
 - **Edit Category**: The functionality for editing categories is not working as expected.
+- **Edit Details**: The functionality for editing items is not working.
+- **Edit Details**: The functionality for Tag items editing items is not working.
+- **Add Tag items Modal**: Havent done yet.
+- **SYSTEM OVERALL UI**: Pangit parin need modify tsaka nalang.  
 
 ---
 
 ### Next Steps:
-- Focus on completing the **Edit Category** functionality.
-- Continue building **Items UI**, **Tags UI**, and **Found/Lost Items UI**.
+
 - Work on **User/Student Interface** once the basic UI components are ready.
