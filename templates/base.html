@@ -57,23 +57,36 @@
             
             </li>
             <li>
+              <a href="{{ url_for('listtagitems') }}">
               <img
               src="{{ url_for('static', filename='images/listtag.png') }}"
               alt="Admin Info Icon"
             />
-              List Tag Item</li>
+          </a><!-- Blue Not Fixed tangina -->
+              <span>List Tag Item</span>
+            </li>
+
+              <li>
+                <a href="{{ url_for('total_found_items') }}">
+                <img
+                src="{{ url_for('static', filename='images/listfound.png') }}"
+                alt="Admin Info Icon"
+              />
+            </a>
+                <span>List Total Found Item</span>
+              </li>
+
+              
             <li>
+              <a href="{{ url_for('total_lost_items') }}">
               <img
               src="{{ url_for('static', filename='images/listlost.png') }}"
               alt="Admin Info Icon"
             />
-              List Total Lost Item</li>
-            <li>
-              <img
-              src="{{ url_for('static', filename='images/listfound.png') }}"
-              alt="Admin Info Icon"
-            />
-              List Total Found Item</li>
+          </a>
+              <span>List Total Lost Item</span>
+            </li>
+           
           </ul>
         </ul>
 

@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}Total Lost Items{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 95%;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing between title & counter */
+}
+
+    .counter_item {
+        margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+    .header h2 {
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .counter {
+    background: #11004E;
+    padding: 10px 15px;
+    border-radius: 5px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+    .filters {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .filters select,
+    .filters input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 150px;
+        background: white;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    thead {
+        background: #11004E;
+        color: white;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #E9E9E9;
+    }
+
+    .status {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+        min-width: 90px;
+        text-align: center;
+    }
+
+    .status.claimed {
+        background-color: #28a745; /* Green */
+        color: white;
+    }
+
+    .status.unclaimed {
+        background-color: #dc3545; /* Red */
+        color: white;
+    }
+
+    .tag-btn {
+        border: none;
+        background: transparent; /* No background */
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .tag-btn:hover {
+        opacity: 0.7;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .pagination button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        background: #979797;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .pagination button:hover {
+        background: #11004E;
+    }
+
+    .page-title{
+        margin: auto;
+        margin-left: 50px;
+        font-weight: lighter;
+    }
+</style>
+
+<div class="header">
+    <h2>Tagged Items</h2>
+    <h2>Admin</h2>
+</div>
+
+<h3 class="page-title"><i>Items / Total Lost Item</i></h3>
+
+<div class="container">
+    
+    <!-- Header Section -->
+    <div class="counter_item">
+        <div class="header-title">
+        <h2>Total Lost Items :</h2>
+        <div class="counter">
+            <span>{{ total_lost_items_count }}</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <input type="text" id="search" placeholder="Search items..." onkeyup="filterItems()">
+    
+        <select id="status-filter" onchange="filterItems()">
+            <option value="">Filter by Status</option>
+            <option value="Claimed">Claimed</option>
+            <option value="Unclaimed">Unclaimed</option>
+        </select>
+    
+        <select id="category-filter" onchange="filterItems()">
+            <option value="">Filter by Category</option>
+            {% for category in categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="tag-filter" onchange="filterItems()">
+            <option value="">Filter by Tag</option>
+            <option value="Tagged">Tagged</option>
+            <option value="Not Tagged">Not Tagged</option>
+        </select>
+    </div>
+
+    <!-- Table Section -->
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date Claimed</th>
+                <th>Date Lost</th>
+                <th>Tag</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lost_items %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.description or 'N/A' }}</td>
+                <td>
+                    <span class="status {% if item.status == 'Claimed' %}claimed{% else %}unclaimed{% endif %}">
+                        {{ item.status }}
+                    </span>
+                </td>
+                <td>{{ item.date_claimed.strftime('%m/%d/%Y') if item.date_claimed else 'N/A' }}</td>
+                <td>{{ item.date_reported.strftime('%m/%d/%Y') }}</td>
+
+                <td>
+                    <button class="tag-btn">
+                        {% if item.rfid_tag %}✅{% else %}❌{% endif %}
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button>←</button>
+        <span>Page 1 of {{ total_pages }}</span>
+        <button>→</button>
+    </div>
+</div>
+
+<script>
+   function filterItems() {
+        let status = document.getElementById("status-filter").value;
+        let category = document.getElementById("category-filter").value;
+        let tag = document.getElementById("tag-filter").value;
+
+        let url = `/items/totalLostItem?status=${encodeURIComponent(status)}&category=${encodeURIComponent(category)}&tag=${encodeURIComponent(tag)}`;
+        window.location.href = url;
+    }
+</script>
+
+{% endblock %}

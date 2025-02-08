@@ -39,9 +39,10 @@ with app.app_context():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+####################################### DASHBOARD ####################################################
+
 @app.route('/')
 def dashboard():
-
     filter_type = request.args.get('filter', 'today')
 
     today = datetime.today()
@@ -54,19 +55,25 @@ def dashboard():
     elif filter_type == 'year':
         start_date = today.replace(month=1, day=1) 
 
-    total_items_active = Item.query.filter_by(status='active').count() 
-    
-    total_items_lost = Item.query.filter(Item.status == 'lost', Item.date_reported >= start_date).count() 
-    total_items_found = Item.query.filter_by(status='found').count() 
+    total_items_lost = Item.query.count()
+    total_items_active = Item.query.filter_by(status='Unclaimed').count()  
+    total_tagged_items = Item.query.filter(Item.rfid_tag.isnot(None)).count()  
+    total_items_found = Item.query.filter_by(status='Claimed').count()
 
     print('Go to Dashboard')
 
+    return render_template(
+        'dashboard.html',
+        total_items_active=total_items_active,
+        total_tagged_items=total_tagged_items,
+        total_items_lost=total_items_lost, 
+        total_items_found=total_items_found,
+        filter_type=filter_type
+    )
 
-    return render_template('dashboard.html',
-                           total_items_active=total_items_active,
-                           total_items_lost=total_items_lost,
-                           total_items_found=total_items_found,
-                           filter_type=filter_type)
+
+
+################################# CATEGORIES ####################################################
 
 @app.route('/categories')
 def categories():
@@ -88,30 +95,50 @@ def get_categories():
     return jsonify([{"id": cat.id, "name": cat.name, "description": cat.description, "status": cat.status} for cat in categories])
 
 
+######################################## ITEMS/ LIST ENTRY ITEMS ####################################################
+
 @app.route('/items/listEntryItem')
 def list_entry_item_page():
     categories = Category.query.all()
-    locations = Location.query.all()  # Fetch locations
+    locations = Location.query.all() 
     return render_template('items/listEntryItem.html', categories=categories, locations=locations)
 
 @app.route('/api/items', methods=["GET"])
 def get_items():
-    items = Item.query.all()
-    items_list = []
+    """
+    This function now serves both `/api/items` and `/get_items`
+    If there are filter parameters, it filters results (previously handled by `/get_items`).
+    """
+    search = request.args.get("search", "")
+    status = request.args.get("status", "")
+    location = request.args.get("location", "")
+    date = request.args.get("date", "")
 
-    for item in items:
-        items_list.append({
+    query = Item.query
+
+    if search:
+        query = query.filter(Item.description.ilike(f"%{search}%"))
+    if status:
+        query = query.filter(Item.status == status)
+    if location:
+        query = query.filter(Item.location_id == Location.id, Location.name == location)
+    if date:
+        query = query.order_by(Item.date_reported.desc() if date == "Newest" else Item.date_reported.asc())
+
+    items = query.all()
+
+    return jsonify([
+        {
             "id": item.id,
-            "category": item.category.name if item.category else "Unknown",  # Now safe ✅
+            "category": item.category.name if item.category else "Unknown",
             "description": item.description,
-            "location": item.location.name if item.location else "Unknown",  # Now safe ✅
-            "date_reported": item.date_reported.strftime("%Y-%m-%d"),
+            "location": item.location.name if item.location else "Unknown",
+            "date_reported": item.date_reported.strftime("%B %d, %Y"),
             "status": item.status,
             "rfid_tag": item.rfid_tag,
             "image_file": item.image_file if item.image_file else "default.jpg"
-        })
-    
-    return jsonify(items_list)
+        } for item in items
+    ])
 
 # API Route for managing items
 @app.route("/api/items", methods=["POST"])
@@ -125,10 +152,8 @@ def list_entry_item_api():
         rfid_tag = request.form.get("rfid_tag")
         image = request.files.get("image")
 
-        # Debugging
         print(f"Received Data: {request.form}")
 
-        # Ensure category_id and location_id are valid
         if not category_id or not location_id:
             return jsonify({"error": "Category and location are required!"}), 400
 
@@ -141,13 +166,11 @@ def list_entry_item_api():
         if not Location.query.get(location_id):
             return jsonify({"error": "Invalid location ID"}), 400
 
-        # Ensure date format
         try:
             date_reported = datetime.strptime(date_reported, "%Y-%m-%d").date()
         except ValueError:
             return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
 
-        # Handle image upload
         image_file = None
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
@@ -155,7 +178,6 @@ def list_entry_item_api():
             image.save(image_path)
             image_file = filename
 
-        # Insert into database
         new_item = Item(
             category_id=category_id,
             description=description,
@@ -175,7 +197,7 @@ def list_entry_item_api():
         return jsonify({"error": "Invalid ID format. Ensure category_id and location_id are integers."}), 400
     except Exception as e:
         db.session.rollback()
-        print("Error:", str(e))  # Debugging
+        print("Error:", str(e)) 
         return jsonify({"error": str(e)}), 500
     
 @app.route('/api/locations', methods=["GET"])
@@ -190,6 +212,97 @@ def get_active_categories():
     categories = Category.query.filter_by(status='Active').all()
     print("Fetched categories:", categories)  # Debugging: Print fetched categories
     return jsonify([{"id": cat.id, "name": cat.name} for cat in categories])
+
+
+#################### LIST ####################################################
+
+@app.route('/listtagitems')
+def listtagitems():
+    return render_template('/items/listTagItem.html')
+
+#################### TOTAL LOST ITEM ####################################################
+
+
+@app.route('/items/totalLostItem')
+def total_lost_items():
+    
+    status_filter = request.args.get("status", "")
+    category_filter = request.args.get("category", "")
+    tag_filter = request.args.get("tag", "")
+
+    query = (
+        db.session.query(
+            Item.id, Item.description, Item.status, Item.date_reported.label("date_reported"),
+            Claim.claim_date.label("date_claimed"), Category.name.label("category"),
+            Item.rfid_tag
+        )
+        .outerjoin(Claim, Claim.item_id == Item.id)  
+        .join(Category, Item.category_id == Category.id) 
+    )
+
+    if status_filter in ["Claimed", "Unclaimed"]:
+        query = query.filter(Item.status == status_filter)
+
+    if category_filter:
+        query = query.filter(Category.name == category_filter)
+
+    if tag_filter == "Tagged":
+        query = query.filter(Item.rfid_tag.isnot(None)) 
+    elif tag_filter == "Not Tagged":
+        query = query.filter(Item.rfid_tag.is_(None)) 
+
+    lost_items = query.all()
+
+    categories = Category.query.with_entities(Category.name).distinct().all()
+    categories = [cat.name for cat in categories]
+
+    return render_template(
+        "items/totalLostItem.html",
+        lost_items=lost_items,
+        total_lost_items_count=len(lost_items),
+        categories=categories
+    )
+
+####### TOTAL LOST ITEMMM ####################################################
+
+@app.route('/items/totalFoundItem')
+def total_found_items():
+  
+    category_filter = request.args.get("category", "")
+    tag_filter = request.args.get("tag", "")
+
+    query = (
+        db.session.query(
+            Item.id, Item.description, Item.status, Item.date_reported.label("date_found"),
+            Claim.claim_date.label("date_claimed"), Category.name.label("category"),
+            Item.rfid_tag
+        )
+        .outerjoin(Claim, Claim.item_id == Item.id)
+        .join(Category, Item.category_id == Category.id) 
+        .filter(Item.status == "Claimed")  
+    )
+
+    if category_filter:
+        query = query.filter(Category.name == category_filter)
+
+    if tag_filter == "Tagged":
+        query = query.filter(Item.rfid_tag.isnot(None))
+    elif tag_filter == "Not Tagged":
+        query = query.filter(Item.rfid_tag.is_(None)) 
+
+    found_items = query.all()
+
+    categories = Category.query.with_entities(Category.name).distinct().all()
+    categories = [cat.name for cat in categories]
+
+    return render_template(
+        "items/totalFoundItem.html",
+        found_items=found_items,
+        total_found_items_count=len(found_items),
+        categories=categories
+    )
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

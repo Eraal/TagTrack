@@ -11,7 +11,8 @@
     }
 
     .container {
-        padding: 20px;
+        width: 90%;
+        margin: auto;
     }
 
     .page-title {
@@ -22,10 +23,33 @@
 
     .filter-bar {
         display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
     }
+
+    .filter-bar input {
+    padding: 8px;
+    width: 30%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filters select, .filters button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
 
     .items-grid {
         display: grid;
@@ -233,22 +257,33 @@
 </style>
 
 <div class="header">
-    <h2>Categories</h2>
+    <h2>Items</h2>
     <h2>Admin</h2>
   </div>
 
 <div class="container">
-    <h2 class="page-title">Categories - Admin</h2>
+    <h2 class="page-title">Items / List Items</h2>
 
     <!-- Search and Filters -->
     <div class="filter-bar">
         <input type="text" id="search" placeholder="Search..." onkeyup="filterItems()">
+        <div class="filters">
+            <h2>Filtered by:</h2>
         <select id="filter-status" onchange="filterItems()">
             <option value="">By Status</option>
             <option value="Unclaimed">Unclaimed</option>
             <option value="Claimed">Claimed</option>
         </select>
+        <select id="location-filter"></select>
+
+        <select id="date-filter">
+            <option value="">All Dates</option>
+            <option value="Newest">Newest</option>
+            <option value="Oldest">Oldest</option>
+        </select>
+
         <button class="add-item-btn" onclick="openAddItemModal()">Add New Item</button>
+    </div>    
     </div>
 
     <!-- Items Grid -->
