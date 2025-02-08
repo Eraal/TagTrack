@@ -1,6 +1,6 @@
 # System Progress
 
-## Current Progress: 23% - In Progress
+## Current Progress: 78% - In Progress
 
 ### Completed Tasks:
 - **Week 1 Day 1**: Dashboard UI - **Completed** (100%)
@@ -37,11 +37,18 @@
 
 ![image](https://github.com/user-attachments/assets/3bfd2268-3bac-4dec-a4e6-e2e565da1858)
 
+- **Week 2 Day 4-6**: - **100% Completed**
+
+  ### Items > List Total Lost Items - **100% Completed**
+
+![image](https://github.com/user-attachments/assets/72e3344e-bdd8-440b-976d-5b3a20f2075a)
+
+  ### Items > List Total Found Items - **100% Completed**
+
+![image](https://github.com/user-attachments/assets/0b3d0a51-90e0-4371-acce-774f15a83070)
+
 
 ### Not Started:
-- **List Tags Item UI** - **0%**
-- **List Total Lost Items UI** - **0%**
-- **List Total Found Items UI** - **0%**
 - **User/Student Interface** - **0%**
 
 ---
