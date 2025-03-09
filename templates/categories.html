@@ -8,7 +8,13 @@
     background: #d9d9d9;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
   }
+
+  .container.loaded{
+        opacity: 1;
+    }
 
   .search-bar {
     padding: 8px;
@@ -47,12 +53,20 @@
   }
 
   .status-btn {
-    background: green;
+  
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
   }
+
+  .status-active {
+  background: green;
+}
+
+.status-inactive {
+  background: red;
+}
 
   .edit-btn {
     background: #ccc;
@@ -62,6 +76,22 @@
     border-radius: 5px;
     cursor: pointer;
   }
+
+  .delete-btn {
+  background: red;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.delete-btn:hover {
+  background: darkred;
+}
+
 
   .modal {
     display: none;
@@ -199,33 +229,210 @@
       <button type="submit" class="create-btn">Submit</button>
     </form>
   </div>
+  </div>
+
+  <!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Category</h2>
+    <form id="editCategoryForm">
+      <input type="hidden" id="editCategoryId" name="id" />
+      <label for="editCategoryName">Name:</label>
+      <input type="text" id="editCategoryName" name="name" required />
+      <label for="editCategoryDescription">Description:</label>
+      <input type="text" id="editCategoryDescription" name="description" required />
+      <label for="editCategoryStatus">Status:</label>
+      <select id="editCategoryStatus" name="status" required>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+      <button type="submit" class="create-btn">Update</button>
+      <button type="button" class="delete-btn" id="deleteCategoryBtn">Delete</button>
+    </form>
+  </div>
+</div>
   
 
   <script>
-    let categories = []; // Global variable to store fetched categories
+let categories = []; // Global variable to store fetched categories
 
-    async function fetchCategories() {
-      const response = await fetch("/get_categories");
-      categories = await response.json(); // Correctly update global categories
-      renderTable(categories);
+// Fetch categories on page load
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("editModal").style.display = "none";
+  document.querySelector(".container").classList.add("loaded");
+  fetchCategories();
+});
+
+
+// Function to open the edit modal and pre-fill the form
+function openEditModal(category) {
+  const editModal = document.getElementById("editModal");
+  
+
+  console.log("Opening edit modal for category:", category); // Debug: Log the category data
+
+  // Pre-fill the form with the category data
+  document.getElementById("editCategoryId").value = category.id;
+  document.getElementById("editCategoryName").value = category.name;
+  document.getElementById("editCategoryDescription").value = category.description;
+  document.getElementById("editCategoryStatus").value = category.status;
+
+  // Display the modal
+  editModal.style.display = "flex";
+}
+
+// Function to close the edit modal
+function closeEditModal() {
+  const editModal = document.getElementById("editModal");
+  editModal.style.display = "none";
+}
+
+// Function to handle the edit form submission
+document.getElementById("editCategoryForm").addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const id = document.getElementById("editCategoryId").value;
+  const name = document.getElementById("editCategoryName").value;
+  const description = document.getElementById("editCategoryDescription").value;
+  const status = document.getElementById("editCategoryStatus").value;
+
+  const response = await fetch(`/update_category/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description, status }),
+  });
+
+  if (response.ok) {
+    fetchCategories(); // Refresh the categories list
+    closeEditModal(); // Close the modal
+  } else {
+    alert("Failed to update category.");
+  }
+});
+
+// Function to add event listeners to Edit buttons
+function addEditButtonListeners() {
+  const editButtons = document.querySelectorAll(".edit-btn");
+
+  editButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      const categoryId = this.getAttribute("data-id");
+      const category = categories.find(c => c.id == categoryId);
+
+      if (category) {
+        openEditModal(category);
+      } else {
+        console.error("Category not found for ID:", categoryId);
+      }
+    });
+  });
+}
+
+// Handle Edit form submission
+document.getElementById("editCategoryForm").addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const id = document.getElementById("editCategoryId").value;
+  const name = document.getElementById("editCategoryName").value;
+  const description = document.getElementById("editCategoryDescription").value;
+  const status = document.getElementById("editCategoryStatus").value;
+
+  try {
+    const response = await fetch(`/update_category/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, description, status }),
+    });
+
+    if (response.ok) {
+      fetchCategories(); // Refresh categories
+      closeEditModal(); // Close modal
+    } else {
+      alert("Failed to update category.");
     }
+  } catch (error) {
+    console.error("Error updating category:", error);
+  }
+});
 
-    function renderTable(data) {
-      const table = document.getElementById("categoryTable");
-      table.innerHTML = "";
-      data.forEach((category, index) => {
-        table.innerHTML += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${category.name}</td>
-                <td>${category.description}</td>
-                <td><button class="status-btn">${category.status}</button></td>
-                <td><button class="edit-btn">Edit</button></td>
-            </tr>
-        `;
-      });
+
+  
+   
+
+
+// Function to fetch categories and render the table
+async function fetchCategories() {
+  try {
+    const response = await fetch("/get_categories");
+    if (!response.ok) throw new Error("Failed to fetch categories");
+    
+    categories = await response.json(); // Update global categories
+    renderTable(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+}
+
+
+// Function to render the table with categories
+function renderTable(data) {
+  const table = document.getElementById("categoryTable");
+  table.innerHTML = ""; // Clear table before re-rendering
+
+  data.forEach((category) => {
+    const statusClass = category.status === "Active" ? "status-active" : "status-inactive";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${category.id}</td>
+      <td>${category.name}</td>
+      <td>${category.description}</td>
+      <td><button class="status-btn ${statusClass}">${category.status}</button></td>
+      <td><button class="edit-btn" data-id="${category.id}">Edit</button></td>
+    `;
+    table.appendChild(row);
+  });
+
+  addEditButtonListeners(); // Ensure event listeners are attached after rendering
+}
+
+// Function to handle category deletion
+// Function to delete a category
+async function deleteCategory() {
+  const categoryId = document.getElementById("editCategoryId").value;
+  if (!categoryId) {
+    alert("No category selected!");
+    return;
+  }
+
+  const confirmDelete = confirm("Are you sure you want to delete this category?");
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`/delete_category/${categoryId}`, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      alert("Category deleted successfully.");
+      fetchCategories(); // Refresh categories
+      closeEditModal(); // Close modal
+    } else {
+      alert("Failed to delete category.");
     }
+  } catch (error) {
+    console.error("Error deleting category:", error);
+  }
+}
 
+// Attach event listener to delete button
+document.getElementById("deleteCategoryBtn").addEventListener("click", deleteCategory);
+
+
+
+
+    
     document.getElementById("search").addEventListener("input", function () {
       const searchTerm = this.value.toLowerCase();
       const filtered = categories.filter((c) =>

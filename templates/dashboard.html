@@ -3,80 +3,191 @@
 {% block title %}Dashboard - TagTrack{% endblock %}
 
 {% block content %}
-  <!-- Header -->
-  <div class="header">
-    <h2>Dashboard</h2>
-    <h2>Admin</h2>
-  </div>
 
-  <!-- Dashboard Cards -->
-  <div class="dashboard-cards">
+<!-- Header -->
+<div class="header">
+    <h2>Dashboard</h2>
+    <h3>Admin</h3>
+</div>
+
+<!-- Dashboard Cards -->
+<div class="dashboard-cards">
     <!-- ITEM ENTRY / Active -->
     <div class="card">
-      <div class="card-icon">
-        <img src="{{ url_for('static', filename='images/itementry.png') }}" alt="Item Entry Icon">
-      </div>
-      <div class="card-content">
-        <div class="card-title">ITEM ENTRY / Active</div>
-        <div class="card-value">{{ total_items_active }}</div>  <!-- Dynamic value -->
-      </div>
+        <div class="card-icon">
+            <img src="{{ url_for('static', filename='images/itementry.png') }}" alt="Item Entry Icon">
+        </div>
+        <div class="card-content">
+            <div class="card-title">ITEM ENTRY / Active</div>
+            <div class="card-value">{{ total_items_active }}</div>
+        </div>
     </div>
 
     <!-- TOTAL TAG ITEMS -->
     <div class="card">
-      <div class="card-icon">
-        <img src="{{ url_for('static', filename='images/totaltagitems.png') }}" alt="Total Tag Items Icon">
-      </div>
-      <div class="card-content">
-        <div class="card-title">TOTAL TAG ITEMS</div>
-        <div class="card-value">{{ total_tagged_items }}</div>  <!-- Dynamic value -->
-      </div>
+        <div class="card-icon">
+            <img src="{{ url_for('static', filename='images/totaltagitems.png') }}" alt="Total Tag Items Icon">
+        </div>
+        <div class="card-content">
+            <div class="card-title">TOTAL TAG ITEMS</div>
+            <div class="card-value">{{ total_tagged_items }}</div>
+        </div>
     </div>
 
     <!-- TOTAL ITEM LOST -->
     <div class="card">
-      <div class="card-icon">
-        <img src="{{ url_for('static', filename='images/totalitemlost.png') }}" alt="Total Lost Items Icon">
-      </div>
-      <div class="card-content">
-        <div class="card-header">
-          <div class="card-title">TOTAL ITEM LOST</div>
-          <div class="filter-dropdown">
-            <form id="lost-filter-form" method="GET" action="{{ url_for('dashboard') }}">
-              <label for="lost-filter">Filtered:</label>
-              <select id="lost-filter" name="filter" onchange="this.form.submit()">
-                <option value="today" {% if filter_type == 'today' %}selected{% endif %}>Today</option>
-                <option value="week" {% if filter_type == 'week' %}selected{% endif %}>By Week</option>
-                <option value="month" {% if filter_type == 'month' %}selected{% endif %}>By Month</option>
-                <option value="year" {% if filter_type == 'year' %}selected{% endif %}>By Year</option>
-              </select>
-            </form>
-          </div>
+        <div class="card-icon">
+            <img src="{{ url_for('static', filename='images/totalitemlost.png') }}" alt="Total Lost Items Icon">
         </div>
-        <div class="card-value">{{ total_items_lost }}</div>  <!-- Dynamic value -->
-      </div>
+        <div class="card-content">
+            <div class="card-title">TOTAL ITEM LOST</div>
+            <div class="card-value">{{ total_items_lost }}</div>
+        </div>
     </div>
 
     <!-- TOTAL ITEM FOUND -->
     <div class="card">
-      <div class="card-icon">
-        <img src="{{ url_for('static', filename='images/totalfounditem.png') }}" alt="Total Found Items Icon">
-      </div>
-      <div class="card-content">
-        <div class="card-header">
-          <div class="card-title">TOTAL ITEM FOUND</div>
-          <div class="filter-dropdown">
-            <label for="found-filter">Filtered:</label>
-            <select id="found-filter">
-              <option value="today">Today</option>
-              <option value="week">By Week</option>
-              <option value="month">By Month</option>
-              <option value="year">By Year</option>
-            </select>
-          </div>
+        <div class="card-icon">
+            <img src="{{ url_for('static', filename='images/totalfounditem.png') }}" alt="Total Found Items Icon">
         </div>
-        <div class="card-value">{{ total_items_found }}</div>  <!-- Dynamic value -->
-      </div>
+        <div class="card-content">
+            <div class="card-title">TOTAL ITEM FOUND</div>
+            <div class="card-value">{{ total_items_found }}</div>
+        </div>
     </div>
+</div>
+
+<!-- Lost Items by Category Chart and Latest Tagged Items -->
+<div class="dashboard-grid">
+  <!-- Existing Lost Items Chart -->
+  <div class="chart-container">
+      <h3>Lost Items by Category</h3>
+      <canvas id="lostItemsChart"></canvas>
   </div>
+
+  <!-- New Found Items by Location Chart -->
+  <div class="chart-container">
+      <h3>Number of Lost Items by Location</h3>
+      <canvas id="foundItemsChart"></canvas>
+  </div>
+
+  <!-- Latest Tagged Items Table -->
+  <div class="latest-tagged-items">
+      <h3>📢 NOTICE: UNCLAIMED TAGGED ITEM</h3>
+      <table>
+          <thead>
+              <tr>
+                  <th>Description</th>
+                  <th>Location</th>
+                  <th>Status</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% if latest_tagged_items %}
+                  {% for item in latest_tagged_items %}
+                      <tr>
+                          <td>{{ item.description }}</td>
+                          <td>{{ item.location.name if item.location else 'Unknown' }}</td>
+                          <td class="status-{{ item.status.lower() | replace(' ', '-') }}">{{ item.status }}</td>
+                      </tr>
+                  {% endfor %}
+              {% else %}
+                  <tr>
+                      <td colspan="3" class="no-data">No recently tagged items.</td>
+                  </tr>
+              {% endif %}
+          </tbody>
+      </table>
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('/found-items-by-location')
+        .then(response => response.json())
+        .then(data => {
+            const locations = data.map(item => item.location);
+            const counts = data.map(item => item.count);
+
+            const ctx = document.getElementById('foundItemsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        label: 'Lost Items',
+                        data: counts,
+                        backgroundColor: 'rgba(200, 80, 80, 0.6)',
+                        borderColor: 'rgba(235, 54, 54, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Lost Items'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Location'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error fetching chart data:", error));
+});
+
+    var lostItemsData = {{ lost_items_by_category | tojson | safe }};
+    var labels = Object.keys(lostItemsData);
+    var values = Object.values(lostItemsData);
+
+    if (labels.length > 0) {
+        var ctx = document.getElementById('lostItemsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    datalabels: {
+                        color: '#000',
+                        font: { weight: 'bold' },
+                        formatter: (value, ctx) => value
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    } else {
+        console.log("No lost items data available.");
+    }
+</script>
+
 {% endblock %}

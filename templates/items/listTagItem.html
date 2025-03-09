@@ -1,212 +1,540 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 0;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
 
-    .container {
-        width: 90%;
-        margin: auto;
-    }
+  .container {
+    width: 95%;
+    margin: 20px auto;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+  }
 
-    .page-title {
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-    }
+  .container.loaded {
+    opacity: 1;
+  }
 
-    .filter-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
+  .page-title {
+    margin: auto;
+    margin-left: 50px;
+    font-weight: lighter;
+  }
 
-    .filter-bar input {
-        padding: 8px;
-        width: 30%;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
+  .filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
 
-    .filters {
-        display: flex;
-        gap: 10px;
-    }
+  .filter-bar input {
+    padding: 8px;
+    width: 30%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 
-    .filters select, .filters button {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
+  .filters {
+    display: flex;
+    gap: 10px;
+  }
 
+  .filters select,
+  .filters button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .item-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .item-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .item-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .item-card img:hover {
+    opacity: 0.9;
+  }
+
+  .item-info {
+    padding: 10px;
+    width: 100%;
+  }
+
+  .item-info p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #444;
+  }
+
+  .item-info strong {
+    color: #222;
+  }
+
+  .status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .status.unclaimed {
+    background-color: #ffdddd;
+    color: #c00;
+  }
+
+  .status.claimed {
+    background-color: #ddffdd;
+    color: #080;
+  }
+
+  .edit-btn {
+    background: navy;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out;
+    margin-top: 10px;
+  }
+
+  .edit-btn:hover {
+    background: darkblue;
+  }
+
+  @media (max-width: 768px) {
     .items-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-        padding: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
+  }
 
-    .item-card {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease-in-out;
-    }
 
-    .item-card:hover {
-        transform: scale(1.02);
-    }
+/* Modal Background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease-in-out;
+}
 
-    .item-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
+/* Modal Box */
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 800px; /* Increased width */
+  padding: 30px; /* Increased padding */
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  text-align: left; /* Align text to the left */
+  animation: fadeIn 0.3s ease-in-out;
+}
 
-    .item-info p {
-        margin: 8px 0;
-    }
+/* Close Button */
+.close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.2s;
+}
 
-    .status.unclaimed {
-        color: red;
-        font-weight: bold;
-    }
+.close:hover {
+  color: red;
+}
 
-    .status.claimed {
-        color: green;
-        font-weight: bold;
-    }
+/* Modal Body */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Increased gap between elements */
+}
 
-    .add-item-btn {
-        background: navy;
-        color: white;
-        padding: 12px 16px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: background 0.3s;
-    }
+/* Modal Image */
+#modal-image {
+  width: 100%;
+  max-height: 300px; /* Increased height */
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 20px; /* Increased margin */
+}
 
-    .add-item-btn:hover {
-        background: darkblue;
-    }
+/* Details Container (Two-Column Layout) */
+.details-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  gap: 30px; /* Increased gap between columns */
+}
 
-    /* Responsive Grid */
-    @media (max-width: 768px) {
-        .items-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        }
-    }
+/* Individual Sections */
+.item-details,
+.owner-details {
+  width: 50%;
+  background: #f5f5f5;
+  padding: 20px; /* Increased padding */
+  border-radius: 8px;
+}
+
+/* Section Headings */
+.item-details h3,
+.owner-details h3 {
+  font-size: 20px; /* Increased font size */
+  margin-bottom: 15px; /* Increased margin */
+  color: #333;
+}
+
+/* Paragraphs */
+.item-details p,
+.owner-details p {
+  margin: 10px 0; /* Increased margin */
+  font-size: 16px; /* Increased font size */
+  color: #555;
+  line-height: 1.6; /* Improved line spacing */
+}
+
+/* Strong Text */
+.item-details strong,
+.owner-details strong {
+  color: #222;
+  font-weight: 600;
+}
+
+/* Close Button */
+.close-btn {
+  background: navy;
+  color: white;
+  padding: 12px 24px; /* Increased padding */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; /* Increased font size */
+  margin-top: 20px; /* Increased margin */
+  transition: background 0.3s;
+}
+
+.close-btn:hover {
+  background: darkblue;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 </style>
 
+
+
+
+
+
 <div class="header">
-    <h2>Tagged Items</h2>
-    <h2>Admin</h2>
+  <h2 class="page-title">📦 Items Management</h2>
+  <h2>Admin</h2>
 </div>
-
+<h3 class="page-title"><i>Items / List Tagged Items</i></h3>
 <div class="container">
-    <h2 class="page-title">Items / List Tagged Items</h2>
-
-    <!-- Search and Filters -->
-    <div class="filter-bar">
-        <input type="text" id="search" placeholder="Search..." onkeyup="filterItems()">
-        <div class="filters">
-            <select id="filter-status" onchange="filterItems()">
-                <option value="">By Status</option>
-                <option value="Unclaimed">Unclaimed</option>
-                <option value="Claimed">Claimed</option>
-            </select>
-            <select id="location-filter"></select>
-            <select id="date-filter">
-                <option value="">All Dates</option>
-                <option value="Newest">Newest</option>
-                <option value="Oldest">Oldest</option>
-            </select>
-        </div>
+  <!-- Search and Filters -->
+  <div class="filter-bar">
+    <input
+      type="text"
+      id="search"
+      placeholder="Search..."
+      onkeyup="filterItems()"
+    />
+    <div class="filters">
+      <select id="filter-status" onchange="filterItems()">
+        <option value="">📌 By Status</option>
+        <option value="Unclaimed">❌ Unclaimed</option>
+        <option value="Claimed">✅ Claimed</option>
+      </select>
+      <select id="location-filter"></select>
+      <select id="date-filter">
+        <option value="">📅 All Dates</option>
+        <option value="Newest">⬆️Newest</option>
+        <option value="Oldest">⬇️Oldest</option>
+      </select>
     </div>
+  </div>
 
-    <div id="items-container" class="items-grid">
-       
-    </div>
+  <div id="items-container" class="items-grid"></div>
 </div>
+
+
+
+
+<!-- Modal Structure -->
+<div id="itemModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2 id="modal-title">Item Details</h2>
+    <div class="modal-body">
+      <img id="modal-image" src="" alt="Item Image">
+      
+      <div class="details-container">
+        <!-- Item Details -->
+        <div class="item-details">
+          <h3>📦 Item Information</h3>
+          <p><strong>Category:</strong> <span id="modal-category"></span></p>
+          <p><strong>Description:</strong> <span id="modal-description"></span></p>
+          <p><strong>Location:</strong> <span id="modal-location"></span></p>
+          <p><strong>Date Reported:</strong> <span id="modal-date"></span></p>
+          <p><strong>Status:</strong> <span id="modal-status"></span></p>
+        </div>
+
+        <!-- Owner Details -->
+<div class="owner-details">
+  <h3>👤 Owner Information</h3>
+  <p><strong>Name:</strong> <span id="modal-owner-name"></span></p>
+  <p><strong>Email:</strong> <span id="modal-owner-email"></span></p>
+  <p><strong>Student ID:</strong> <span id="modal-owner-student-id"></span></p>
+  <p><strong>Contact Number:</strong> <span id="modal-owner-contact"></span></p>
+</div>
+      </div>
+    </div>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+
+
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        fetchTaggedItems();
+  let taggedItems = []; // Store only RFID-tagged items
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".container").classList.add("loaded");
+    fetchTaggedItems();
+    fetchLocations(); // Fetch and populate locations
+  });
+
+
+
+
+  async function fetchLocations() {
+    try {
+      const response = await fetch("/api/locations");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch locations: ${response.statusText}`);
+      }
+      const locations = await response.json();
+      const locationDropdown = document.getElementById("location-filter");
+
+      // Clear and add default option
+      locationDropdown.innerHTML = '<option value="">📍 By Location</option>';
+
+      // Populate dropdown
+      locations.forEach((loc) => {
+        let option = document.createElement("option");
+        option.value = loc.name;
+        option.textContent = loc.name;
+        locationDropdown.appendChild(option);
+      });
+
+      locationDropdown.addEventListener("change", filterItems);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  }
+
+
+
+
+
+  async function fetchTaggedItems() {
+  try {
+    const response = await fetch("/api/tagged-items");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch items: ${response.statusText}`);
+    }
+    const items = await response.json();
+
+    // Debugging: Log API response
+    console.log("Fetched Items from API:", items);
+
+    // Store only RFID-tagged items
+    taggedItems = items;
+
+    console.log("Filtered Tagged Items:", taggedItems); // Debugging check
+    renderItems(taggedItems); // Render only valid tagged items
+  } catch (error) {
+    console.error("Error fetching tagged items:", error);
+  }
+}
+
+
+
+
+
+
+
+
+  // Render tagged items
+  function renderItems(items) {
+  const container = document.getElementById("items-container");
+  container.innerHTML = "";
+
+  if (items.length === 0) {
+    container.innerHTML = "<p>No tagged items found.</p>";
+    return;
+  }
+
+  items.forEach((item) => {
+    const card = document.createElement("div");
+    card.classList.add("item-card");
+
+    card.innerHTML = `
+      <img src="${item.image_file ? "/uploads/" + item.image_file : "default.jpg"}" alt="Item Image">
+      <div class="item-info">
+        <p><strong>Category:</strong> ${item.category}</p>
+        <p><strong>Description:</strong> ${item.description}</p>
+        <p><strong>Location:</strong> ${item.location}</p>
+        <p><strong>Date Reported:</strong> ${item.date_reported}</p>
+        <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
+        <button class="edit-btn view-details-btn" data-item='${JSON.stringify(item)}'>
+          🔍 View Details
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  // Attach event listeners to all "View Details" buttons
+  document.querySelectorAll(".view-details-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    const item = JSON.parse(this.getAttribute("data-item"));
+    openModal(item);
+  });
+});
+}
+
+
+
+
+function openModal(item) {
+    console.log("Opening modal with item:", item); // Debugging
+
+    document.getElementById("modal-title").innerText = item.category;
+    document.getElementById("modal-image").src = item.image_file
+        ? "/uploads/" + item.image_file
+        : "default.jpg";
+    document.getElementById("modal-category").innerText = item.category;
+    document.getElementById("modal-description").innerText = item.description;
+    document.getElementById("modal-location").innerText = item.location;
+    document.getElementById("modal-date").innerText = item.date_reported;
+    document.getElementById("modal-status").innerText = item.status;
+
+    // Check if owner details exist before assigning them
+    document.getElementById("modal-owner-name").innerText = item.owner_name || "N/A";
+    document.getElementById("modal-owner-email").innerText = item.owner_email || "N/A";
+    document.getElementById("modal-owner-student-id").innerText = item.owner_student_id || "N/A";
+    document.getElementById("modal-owner-contact").innerText = item.owner_contact || "N/A";
+
+    document.getElementById("itemModal").style.display = "flex";
+}
+
+
+function closeModal() {
+    document.getElementById("itemModal").style.display = "none";
+}
+
+// Attach event listeners to close buttons after the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".close").addEventListener("click", closeModal);
+    document.querySelector(".close-btn").addEventListener("click", closeModal);
+});
+
+  
+  // Filter items based on search and status
+  function filterItems() {
+    const search = document.getElementById("search").value.toLowerCase();
+    const status = document.getElementById("filter-status").value;
+    const location = document.getElementById("location-filter").value;
+    const dateFilter = document.getElementById("date-filter").value;
+
+    let filteredItems = taggedItems.filter((item) => {
+      return (
+        (search === "" ||
+          item.description.toLowerCase().includes(search) ||
+          item.category.toLowerCase().includes(search) ||
+          item.location.toLowerCase().includes(search) ||
+          item.rfid_tag.toLowerCase().includes(search)) &&
+        (status === "" || item.status === status) &&
+        (location === "" || item.location === location)
+      );
     });
 
-    async function fetchTaggedItems() {
-        try {
-            const response = await fetch("/api/items");
-            if (!response.ok) {
-                throw new Error(`Failed to fetch items: ${response.statusText}`);
-            }
-            const items = await response.json();
-            const taggedItems = items.filter(item => item.rfid_tag);
-            renderItems(taggedItems);
-        } catch (error) {
-            console.error("Error fetching tagged items:", error);
-        }
+    // Sort items by date if selected
+    if (dateFilter === "Newest") {
+      filteredItems.sort(
+        (a, b) => new Date(b.date_reported) - new Date(a.date_reported)
+      );
+    } else if (dateFilter === "Oldest") {
+      filteredItems.sort(
+        (a, b) => new Date(a.date_reported) - new Date(b.date_reported)
+      );
     }
 
-    // Render tagged items
-    function renderItems(items) {
-        const container = document.getElementById("items-container");
-        container.innerHTML = ""; // Clear existing items
-
-        if (items.length === 0) {
-            container.innerHTML = "<p>No tagged items found.</p>";
-            return;
-        }
-
-        items.forEach(item => {
-            const card = document.createElement("div");
-            card.classList.add("item-card");
-            card.innerHTML = `
-                <img src="${item.image_file ? '/uploads/' + item.image_file : 'default.jpg'}" alt="Item Image">
-                <div class="item-info">
-                    <p><strong>Category:</strong> ${item.category}</p>
-                    <p><strong>Description:</strong> ${item.description}</p>
-                    <p><strong>Location:</strong> ${item.location}</p>
-                    <p><strong>Date Reported:</strong> ${item.date_reported}</p>
-                    <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
-                    <p><strong>RFID Tag:</strong> ${item.rfid_tag}</p>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    // Filter items based on search and status
-    function filterItems() {
-        const search = document.getElementById("search").value.toLowerCase();
-        const status = document.getElementById("filter-status").value;
-
-        fetch("/api/items")
-            .then(response => response.json())
-            .then(items => {
-                const taggedItems = items.filter(item => item.rfid_tag); // Only tagged items
-                const filteredItems = taggedItems.filter(item => {
-                    return (
-                        (search === "" || item.description.toLowerCase().includes(search)) &&
-                        (status === "" || item.status === status)
-                    );
-                });
-                renderItems(filteredItems);
-            });
-    }
+    renderItems(filteredItems);
+  }
 </script>
 
 {% endblock %}

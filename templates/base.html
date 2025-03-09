@@ -8,114 +8,106 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
-
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
-    <script
-      src="{{ url_for('static', filename='js/script.js') }}"
-      defer
-    ></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+
+    <style>
+      .active {
+        background-color: #11004E; /* Highlight color */
+        color: white;
+        border-radius: 5px;
+      }
+      /* Ensure submenu is displayed when active */
+      .submenu {
+        display: none; /* Default: Hidden */
+      }
+      .submenu.open {
+        display: block; /* Keep open when active */
+      }
+      /* Highlight the parent 'Items' when inside submenu */
+      .toggle-items.active {
+        background-color: #11004E; 
+        color: white;
+        border-radius: 5px;
+      }
+    </style>
   </head>
   <body>
+    
     <div class="layout">
       <!-- Sidebar -->
       <div class="sidebar">
         <h1 class="sidebar-title">TagTrack</h1>
         <ul class="sidebar-menu">
-          <li>
+          <li class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
             <a href="{{ url_for('dashboard') }}">
-              <img src="{{ url_for('static', filename='images/dashboard.png') }}" alt="Dashboard Icon" />     
-          </a> <!-- Blue Not Fixed tangina -->
-            <span>Dashboard</span>     
+                <img src="{{ url_for('static', filename='images/dashboard.png') }}" alt="Dashboard Icon" />
+            </a>
+            <span>Dashboard</span>
           </li>
 
-          <li>
+          <li class="{% if request.endpoint == 'categories' %}active{% endif %}">
             <a href="{{ url_for('categories') }}">
                 <img src="{{ url_for('static', filename='images/categories.png') }}" alt="Categories Icon" />
-              </a><!-- Blue Not Fixed tangina -->
-                <span>Categories</span>
-            
-        </li>
-        
-          <li class="toggle-items">
-            <img
-              src="{{ url_for('static', filename='images/categories.png') }}"
-              alt="Items Icon"
-            />
+            </a>
+            <span>Categories</span>
+          </li>
+
+          <!-- Items Dropdown -->
+          {% set items_pages = ['list_entry_item_page', 'listtagitems', 'total_found_items', 'total_lost_items'] %}
+          <li class="toggle-items {% if request.endpoint in items_pages %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/categories.png') }}" alt="Items Icon" />
             <span>Items</span>
           </li>
 
-          <!-- SUBMENU HIDDEN -->
-          <ul class="submenu hidden">
-            <li>
+          <!-- SUBMENU -->
+          <ul class="submenu {% if request.endpoint in items_pages %}open{% else %}hidden{% endif %}">
+            <li class="{% if request.endpoint == 'list_entry_item_page' %}active{% endif %}">
               <a href="{{ url_for('list_entry_item_page') }}">
                 <img src="{{ url_for('static', filename='images/categories.png') }}" alt="Categories Icon" />
-              </a><!-- Blue Not Fixed tangina -->
-                <span>List Entry Items</span>
-            
+              </a>
+              <span>List Entry Items</span>
             </li>
-            <li>
+            <li class="{% if request.endpoint == 'listtagitems' %}active{% endif %}">
               <a href="{{ url_for('listtagitems') }}">
-              <img
-              src="{{ url_for('static', filename='images/listtag.png') }}"
-              alt="Admin Info Icon"
-            />
-          </a><!-- Blue Not Fixed tangina -->
+                <img src="{{ url_for('static', filename='images/listtag.png') }}" alt="List Tag Icon" />
+              </a>
               <span>List Tag Item</span>
             </li>
-
-              <li>
-                <a href="{{ url_for('total_found_items') }}">
-                <img
-                src="{{ url_for('static', filename='images/listfound.png') }}"
-                alt="Admin Info Icon"
-              />
-            </a>
-                <span>List Total Found Item</span>
-              </li>
-
-              
-            <li>
+            <li class="{% if request.endpoint == 'total_found_items' %}active{% endif %}">
+              <a href="{{ url_for('total_found_items') }}">
+                <img src="{{ url_for('static', filename='images/listfound.png') }}" alt="Found Items Icon" />
+              </a>
+              <span>List Total Found Item</span>
+            </li>
+            <li class="{% if request.endpoint == 'total_lost_items' %}active{% endif %}">
               <a href="{{ url_for('total_lost_items') }}">
-              <img
-              src="{{ url_for('static', filename='images/listlost.png') }}"
-              alt="Admin Info Icon"
-            />
-          </a>
+                <img src="{{ url_for('static', filename='images/listlost.png') }}" alt="Lost Items Icon" />
+              </a>
               <span>List Total Lost Item</span>
             </li>
-           
           </ul>
         </ul>
 
-<div class="information">
-     <ul>
-          <li class="admin-information">
-            <img
-              src="{{ url_for('static', filename='images/person.png') }}"
-              alt="Admin Info Icon"
-            />
-            <span>Admin Information</span>
-          </li>
+        <div class="information">
+          <ul>
+            <li class="admin-information">
+              <img src="{{ url_for('static', filename='images/person.png') }}" alt="Admin Info Icon" />
+              <span>Admin Information</span>
+            </li>
 
-
-          <li class="system-information">
-            <img
-              src="{{ url_for('static', filename='images/system.png') }}"
-              alt="System Info Icon"
-            />
-            <span>System Information</span>
-          </li>
-        </ul>
-      </div>
+            <li class="system-information">
+              <img src="{{ url_for('static', filename='images/system.png') }}" alt="System Info Icon" />
+              <span>System Information</span>
+            </li>
+          </ul>
+        </div>
 
         <div class="logout">
-          <img
-            src="{{ url_for('static', filename='images/a.png') }}"
-            alt="Logout Icon"
-          />
+          <img src="{{ url_for('static', filename='images/a.png') }}" alt="Logout Icon" />
           <span>Logout</span>
         </div>
       </div>
