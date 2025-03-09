@@ -1,10 +1,13 @@
 // Sidebar toggle for "Items"
-const toggleItems = document.querySelector('.toggle-items');
-const submenu = document.querySelector('.submenu');
+document.addEventListener("DOMContentLoaded", function () {
+  const toggleItems = document.querySelector(".toggle-items");
+  const submenu = document.querySelector(".submenu");
 
-toggleItems.addEventListener('click', () => {
-  submenu.classList.toggle('hidden');
+  toggleItems.addEventListener("click", function () {
+      submenu.classList.toggle("open");
+  });
 });
+
 
 // Filter functionality
 const filters = document.querySelectorAll('.filter');
