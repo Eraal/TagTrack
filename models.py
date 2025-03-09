@@ -30,9 +30,12 @@ class Item(db.Model):
     image_file = db.Column(db.String(255))
     rfid_tag = db.Column(db.String(255))
     status = db.Column(db.String(50), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))  
+
 
     category = db.relationship('Category', back_populates="items")
     location = db.relationship('Location', back_populates="items")
+    owner = db.relationship('User', back_populates="items")
 
  
 
@@ -44,6 +47,9 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     student_id = db.Column(db.String(50), unique=True, nullable=False)
+    contact_number = db.Column(db.String(15), nullable=True)
+
+    items = db.relationship('Item', back_populates="owner")
 
 
 # Claims Table
@@ -51,6 +57,8 @@ class Claim(db.Model):
     __tablename__ = 'claims'
     id = db.Column(db.Integer, primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id', ondelete='CASCADE'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
     claim_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(50), nullable=False)
+
+    item = db.relationship('Item', backref=db.backref('claim', uselist=False))

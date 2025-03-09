@@ -1,14 +1,18 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for, redirect, session, flash
+from functools import wraps
 from datetime import datetime, timedelta
-from extensions import db 
 from models import Item, Category, Location
 import os
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
+from models import db, Item, Claim, Category
+from collections import defaultdict
+
 
 # Initialize the Flask app
 app = Flask(__name__)
 
+app.secret_key = "Rald" 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/tagtrack'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -39,37 +43,194 @@ with app.app_context():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-####################################### DASHBOARD ####################################################
+
+########################################### ADMIN PAGE ####################################
+
+# Hardcoded admin credentials (No database needed)
+ADMIN_CREDENTIALS = {"admin": "123"}
+
+# ------------------ ADMIN LOGIN ROUTE ------------------
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if username in ADMIN_CREDENTIALS and ADMIN_CREDENTIALS[username] == password:
+            session['admin_logged_in'] = True
+            session['admin_username'] = username
+            flash("Login successful!", "success")
+            return redirect(url_for('dashboard'))  # Redirect to dashboard
+        else:
+            flash("Invalid credentials!", "danger")
+
+    return render_template('admin/admin_login.html')
+
+# ------------------ ADMIN LOGOUT ROUTE ------------------
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    session.pop('admin_username', None)
+    flash("Logged out successfully!", "info")
+    return redirect(url_for('admin_login'))
+
+# ------------------ ADMIN AUTH DECORATOR ------------------
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            flash("Please log in to access the dashboard!", "warning")
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+############################################################## DASHBOARD ###################################################################
 
 @app.route('/')
+@admin_required
 def dashboard():
-    filter_type = request.args.get('filter', 'today')
-
-    today = datetime.today()
-    if filter_type == 'today':
-        start_date = today
-    elif filter_type == 'week':
-        start_date = today - timedelta(days=today.weekday())  
-    elif filter_type == 'month':
-        start_date = today.replace(day=1)  
-    elif filter_type == 'year':
-        start_date = today.replace(month=1, day=1) 
 
     total_items_lost = Item.query.count()
     total_items_active = Item.query.filter_by(status='Unclaimed').count()  
-    total_tagged_items = Item.query.filter(Item.rfid_tag.isnot(None)).count()  
+    total_tagged_items = Item.query.filter(Item.rfid_tag != "None").count()  
     total_items_found = Item.query.filter_by(status='Claimed').count()
+  
+    
+    # Fetch lost items grouped by category
+    lost_items_by_category = (
+        db.session.query(Category.name, db.func.count(Item.id))
+        .join(Item, Category.id == Item.category_id)
+        .filter(Item.status == 'Unclaimed')  # Only count unclaimed lost items
+        .group_by(Category.name)
+        .all()
+    )
 
-    print('Go to Dashboard')
+    # Convert list of tuples to dictionary
+    lost_items_by_category_dict = {category: count for category, count in lost_items_by_category}
+
+    # Fetch the latest tagged item
+    latest_tagged_items = (
+        Item.query.filter(Item.rfid_tag == "Tagged", Item.status == "Unclaimed")
+        .order_by(Item.date_reported.desc())  # Assuming date_reported is used for latest items
+        .limit(5)
+        .all()
+    )
+ 
+
+    print("Fetched latest tagged lost items:", latest_tagged_items)
 
     return render_template(
         'dashboard.html',
         total_items_active=total_items_active,
         total_tagged_items=total_tagged_items,
-        total_items_lost=total_items_lost, 
+        total_items_lost=total_items_lost,
         total_items_found=total_items_found,
-        filter_type=filter_type
+        lost_items_by_category=lost_items_by_category_dict,
+        latest_tagged_items=latest_tagged_items
     )
+
+@app.route('/found-items-by-location')
+def found_items_by_location():
+    results = (
+        db.session.query(Location.name, db.func.count(Item.id))
+        .join(Item, Location.id == Item.location_id)
+        .filter(Item.status == 'Unclaimed')  # Only count found items
+        .group_by(Location.name)
+        .all()
+    )
+
+    data = [{"location": loc, "count": count} for loc, count in results]
+    return jsonify(data)
+
+
+############################################## UPDATE ITEM ON LIST ENTRY ##########################################
+
+@app.route('/api/items/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+    try:
+        item = Item.query.get(item_id)
+        if not item:
+            return jsonify({"error": "Item not found"}), 404
+
+        print(f"Current item status: {item.status}")
+
+        if "category_id" in request.form and request.form["category_id"].isdigit():
+            item.category_id = int(request.form["category_id"])
+
+        if "location_id" in request.form and request.form["location_id"].isdigit():
+            item.location_id = int(request.form["location_id"])
+
+        if "description" in request.form:
+            item.description = request.form["description"].strip()
+
+        if "date_reported" in request.form:
+            try:
+                item.date_reported = datetime.strptime(request.form["date_reported"], "%Y-%m-%d").date()
+            except ValueError:
+                return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+
+        if "status" in request.form:
+            new_status = request.form["status"].strip()
+            print(f"New status: {new_status}") 
+
+            if item.status != "Claimed" and new_status == "Claimed":
+                print("Status changed to Claimed. Creating a new claim record...") 
+                item.status = "Claimed"
+
+                claim_entry = Claim(item_id=item.id, claim_date=datetime.utcnow(), status="Claimed")
+                db.session.add(claim_entry)
+            else:
+                item.status = new_status
+
+        if "rfid_tag" in request.form:
+            item.rfid_tag = request.form["rfid_tag"].strip()
+
+        if "image" in request.files:
+            image = request.files["image"]
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                image.save(image_path)
+                item.image_file = filename 
+
+        db.session.commit()
+        return jsonify({"message": "Item updated successfully!"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating item: {str(e)}")  
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/claimed-items', methods=['GET'])
+def get_claimed_items():
+    """Fetch all claimed items with their claim date."""
+    claimed_items = (
+        db.session.query(
+            Item.id, Item.description, Item.status, Item.date_reported.label("date_reported"),
+            Claim.claim_date.label("date_claimed"), Category.name.label("category"),
+            Item.rfid_tag
+        )
+        .join(Claim, Claim.item_id == Item.id)
+        .join(Category, Item.category_id == Category.id)
+        .filter(Item.status == "Claimed") 
+        .all()
+    )
+
+    result = []
+    for item in claimed_items:
+        result.append({
+            "id": item.id,
+            "category": item.category,
+            "description": item.description,
+            "date_reported": item.date_reported.strftime("%Y-%m-%d"),
+            "date_claimed": item.date_claimed.strftime("%Y-%m-%d") if item.date_claimed else "Not Available",
+            "rfid_tag": item.rfid_tag,
+            "status": item.status
+        })
+
+    return jsonify(result)
 
 
 
@@ -89,10 +250,53 @@ def add_category():
     db.session.commit()
     return jsonify({"message": "Category added successfully!"}), 201
 
-@app.route('/get_categories')
+@app.route("/get_categories", methods=["GET"])
 def get_categories():
     categories = Category.query.all()
-    return jsonify([{"id": cat.id, "name": cat.name, "description": cat.description, "status": cat.status} for cat in categories])
+    categories_data = []
+
+    for category in categories:
+        has_items = db.session.query(Item.id).filter_by(category_id=category.id).first() is not None
+        status = "Active" if has_items else "Inactive"
+
+        categories_data.append({
+            "id": category.id,
+            "name": category.name,
+            "description": category.description,
+            "status": status, 
+        })
+
+    return jsonify(categories_data)
+
+
+@app.route('/update_category/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            return jsonify({"error": "Category not found"}), 404
+
+        data = request.json
+        category.name = data.get("name", category.name)
+        category.description = data.get("description", category.description)
+        category.status = data.get("status", category.status)
+
+        db.session.commit()
+        return jsonify({"message": "Category updated successfully!"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/delete_category/<int:id>', methods=['DELETE'])
+def delete_category(id):
+    category = Category.query.get(id)
+    if not category:
+        return jsonify({"error": "Category not found"}), 404
+
+    db.session.delete(category)
+    db.session.commit()
+    
+    return jsonify({"message": "Category deleted successfully"}), 200
 
 
 ######################################## ITEMS/ LIST ENTRY ITEMS ####################################################
@@ -103,27 +307,32 @@ def list_entry_item_page():
     locations = Location.query.all() 
     return render_template('items/listEntryItem.html', categories=categories, locations=locations)
 
-@app.route('/api/items', methods=["GET"])
+@app.route("/api/items", methods=["GET"])
 def get_items():
-    """
-    This function now serves both `/api/items` and `/get_items`
-    If there are filter parameters, it filters results (previously handled by `/get_items`).
-    """
-    search = request.args.get("search", "")
-    status = request.args.get("status", "")
-    location = request.args.get("location", "")
-    date = request.args.get("date", "")
+    search = request.args.get("search", "").strip()
+    status = request.args.get("status", "").strip()
+    location_id = request.args.get("location", "").strip()
+    date_sort = request.args.get("date", "").strip()  # Sorting order
 
     query = Item.query
 
+    # Search by description (case-insensitive)
     if search:
         query = query.filter(Item.description.ilike(f"%{search}%"))
+
+    # Filter by status (Claimed / Unclaimed)
     if status:
         query = query.filter(Item.status == status)
-    if location:
-        query = query.filter(Item.location_id == Location.id, Location.name == location)
-    if date:
-        query = query.order_by(Item.date_reported.desc() if date == "Newest" else Item.date_reported.asc())
+
+    # Filter by location_id (ensure conversion to integer)
+    if location_id.isdigit():
+        query = query.filter(Item.location_id == int(location_id))
+
+    # Sort by date (Newest / Oldest)
+    if date_sort.lower() == "newest":
+        query = query.order_by(Item.date_reported.desc())
+    elif date_sort.lower() == "oldest":
+        query = query.order_by(Item.date_reported.asc())
 
     items = query.all()
 
@@ -133,17 +342,39 @@ def get_items():
             "category": item.category.name if item.category else "Unknown",
             "description": item.description,
             "location": item.location.name if item.location else "Unknown",
+            "location_id": item.location_id,
             "date_reported": item.date_reported.strftime("%B %d, %Y"),
             "status": item.status,
             "rfid_tag": item.rfid_tag,
             "image_file": item.image_file if item.image_file else "default.jpg"
-        } for item in items
+        }
+        for item in items
     ])
 
-# API Route for managing items
+
+@app.route("/api/items/<int:item_id>", methods=["GET"])
+def get_item_by_id(item_id):
+    item = Item.query.get(item_id)
+
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+
+    return jsonify({
+        "id": item.id,
+        "category_id": item.category_id,
+        "description": item.description,
+        "location": item.location.name if item.location else "Unknown",
+        "location_id": item.location_id,
+        "date_reported": item.date_reported.strftime("%Y-%m-%d"),
+        "status": item.status,
+        "rfid_tag": item.rfid_tag,
+        "image_file": item.image_file if item.image_file else "default.jpg"
+    })
+
 @app.route("/api/items", methods=["POST"])
 def list_entry_item_api():
     try:
+        # Get form data
         category_id = request.form.get("category_id")
         location_id = request.form.get("location_id")
         description = request.form.get("description")
@@ -154,23 +385,28 @@ def list_entry_item_api():
 
         print(f"Received Data: {request.form}")
 
+        # Validate required fields
         if not category_id or not location_id:
             return jsonify({"error": "Category and location are required!"}), 400
 
+        # Convert IDs to integers
         category_id = int(category_id)
         location_id = int(location_id)
 
+        # Validate category and location IDs
         if not Category.query.get(category_id):
             return jsonify({"error": "Invalid category ID"}), 400
 
         if not Location.query.get(location_id):
             return jsonify({"error": "Invalid location ID"}), 400
 
+        # Parse date
         try:
             date_reported = datetime.strptime(date_reported, "%Y-%m-%d").date()
         except ValueError:
             return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
 
+        # Handle image upload
         image_file = None
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
@@ -178,6 +414,7 @@ def list_entry_item_api():
             image.save(image_path)
             image_file = filename
 
+        # Create new item
         new_item = Item(
             category_id=category_id,
             description=description,
@@ -216,9 +453,63 @@ def get_active_categories():
 
 #################### LIST ####################################################
 
+@app.route('/api/tagged-items', methods=['GET'])
+def get_tagged_items():
+    # Filter items where rfid_tag is not None and not an empty string
+    items = Item.query.filter(
+        Item.rfid_tag.isnot(None),  # Exclude NULL values
+        Item.rfid_tag != "None"         # Exclude empty strings
+    ).all()
+
+    items_list = [
+        {
+            "id": item.id,
+            "category": item.category.name,
+            "description": item.description,
+            "location": item.location.name,
+            "date_reported": item.date_reported.strftime("%Y-%m-%d"),
+            "status": item.status,
+            "image_file": item.image_file,
+            "rfid_tag": item.rfid_tag,
+            "owner_name": item.owner.name if item.owner else "N/A",
+            "owner_email": item.owner.email if item.owner else "N/A",
+            "owner_student_id": item.owner.student_id if item.owner else "N/A",
+            "owner_contact": item.owner.contact_number if item.owner else "N/A",
+        }
+        for item in items
+    ]
+    print(items_list)  # ✅ Debugging: Print the data in Flask console
+    return jsonify(items_list)
+
+
+
 @app.route('/listtagitems')
 def listtagitems():
     return render_template('/items/listTagItem.html')
+
+
+@app.route('/api/item/<int:item_id>')
+def get_item_details(item_id):
+    item = Item.query.get_or_404(item_id)
+    
+    # Find the latest claim (if any)
+    claim = Claim.query.filter_by(item_id=item.id).first()
+    owner = User.query.get(claim.user_id) if claim else None
+
+    return jsonify({
+        "id": item.id,
+        "category": item.category.name,
+        "description": item.description,
+        "location": item.location.name,
+        "date_reported": item.date_reported.strftime('%Y-%m-%d'),
+        "status": item.status,
+        "image_file": item.image_file,
+        "owner_name": owner.name if owner else "Unclaimed",
+        "owner_email": owner.email if owner else "N/A"
+    })
+
+
+
 
 #################### TOTAL LOST ITEM ####################################################
 
