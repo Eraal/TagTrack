@@ -1,438 +1,384 @@
 {% extends "base.html" %} {% block title %}Categories - TagTrack{% endblock %}
 {% block content %}
-<style>
-  .container {
-    max-width: 1500px;
-    margin: auto;
-    padding: 20px;
-    background: #d9d9d9;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s ease-in;
-  }
-
-  .container.loaded{
-        opacity: 1;
-    }
-
-  .search-bar {
-    padding: 8px;
-    width: 200px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-
-  .create-btn {
-    background: #4a47a3;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  th,
-  td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-
-  th {
-    background: #ddd;
-    cursor: pointer;
-  }
-
-  .status-btn {
-  
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
-
-  .status-active {
-  background: green;
-}
-
-.status-inactive {
-  background: red;
-}
-
-  .edit-btn {
-    background: #ccc;
-    color: black;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  .delete-btn {
-  background: red;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s;
-}
-
-.delete-btn:hover {
-  background: darkred;
-}
-
-
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-content {
-    background: #fff;
-    padding: 25px;
-    width: 90%;
-    max-width: 450px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  .close {
-    position: absolute;
-    top: 12px;
-    right: 15px;
-    font-size: 22px;
-    color: #555;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .close:hover,
-  .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-
-  .create-btn {
-    background: #4a47a3;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s;
-  }
-
-  .create-btn:hover {
-    background: #383585;
-  }
-
-  @media (max-width: 768px) {
-    .container {
-      padding: 10px;
-    }
-
-    .header {
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .search-bar {
-      width: 100%;
-    }
-
-    table {
-      font-size: 14px;
-    }
-  }
-</style>
-
-<div class="header">
-  <h2>Categories</h2>
-  <h2>Admin</h2>
+<div class="bg-white p-6 shadow-sm rounded-lg mb-6">
+  <h2 class="text-2xl font-bold">Categories</h2>
 </div>
-
-<div class="container">
-  <div class="header">
-    <input type="text" class="search-bar" id="search" placeholder="Search..." />
-    <button class="create-btn">Create New</button>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th onclick="sortTable(1)">Name</th>
-        <th>Description</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="categoryTable">
-      <!-- Table rows will be generated dynamically -->
-    </tbody>
-  </table>
-</div>
-
-<!-- The Modal -->
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Create New Category</h2>
-    <form id="createCategoryForm">
-      <label for="categoryName">Name:</label>
-      <input type="text" id="categoryName" name="categoryName" required />
-      <label for="categoryDescription">Description:</label>
+<div class="flex flex-col gap-4 p-4">
+  <div
+    id="container"
+    class="bg-gray-100 rounded-lg shadow-lg p-6 transition-opacity duration-300 opacity-0"
+  >
+    <div
+      class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6"
+    >
       <input
         type="text"
-        id="categoryDescription"
-        name="categoryDescription"
-        required
+        id="search"
+        placeholder="Search..."
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-64"
       />
-      <button type="submit" class="create-btn">Submit</button>
-    </form>
-  </div>
+      <button
+        class="create-btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-200 font-medium"
+      >
+        Create New
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full bg-white rounded-lg overflow-hidden shadow">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="py-3 px-4 text-left">#</th>
+            <th
+              class="py-3 px-4 text-left cursor-pointer"
+              onclick="sortTable(1)"
+            >
+              <div class="flex items-center">
+                Name
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                  />
+                </svg>
+              </div>
+            </th>
+            <th class="py-3 px-4 text-left">Description</th>
+            <th class="py-3 px-4 text-left">Status</th>
+            <th class="py-3 px-4 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody id="categoryTable" class="divide-y divide-gray-100">
+          <!-- Table rows will be generated dynamically -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Edit Modal -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeEditModal()">&times;</span>
-    <h2>Edit Category</h2>
-    <form id="editCategoryForm">
-      <input type="hidden" id="editCategoryId" name="id" />
-      <label for="editCategoryName">Name:</label>
-      <input type="text" id="editCategoryName" name="name" required />
-      <label for="editCategoryDescription">Description:</label>
-      <input type="text" id="editCategoryDescription" name="description" required />
-      <label for="editCategoryStatus">Status:</label>
-      <select id="editCategoryStatus" name="status" required>
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-      </select>
-      <button type="submit" class="create-btn">Update</button>
-      <button type="button" class="delete-btn" id="deleteCategoryBtn">Delete</button>
-    </form>
+  <!-- Create Category Modal -->
+  <div
+    id="myModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Create New Category</h2>
+        <span
+          class="close text-gray-500 hover:text-gray-800 text-2xl cursor-pointer"
+          >&times;</span
+        >
+      </div>
+      <form id="createCategoryForm" class="space-y-4">
+        <div>
+          <label
+            for="categoryName"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Name:</label
+          >
+          <input
+            type="text"
+            id="categoryName"
+            name="categoryName"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="categoryDescription"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Description:</label
+          >
+          <input
+            type="text"
+            id="categoryDescription"
+            name="categoryDescription"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition duration-200 font-medium"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
   </div>
-</div>
-  
+
+  <!-- Edit Category Modal -->
+  <div
+    id="editModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Edit Category</h2>
+        <span
+          class="close text-gray-500 hover:text-gray-800 text-2xl cursor-pointer"
+          onclick="closeEditModal()"
+          >&times;</span
+        >
+      </div>
+      <form id="editCategoryForm" class="space-y-4">
+        <input type="hidden" id="editCategoryId" name="id" />
+        <div>
+          <label
+            for="editCategoryName"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Name:</label
+          >
+          <input
+            type="text"
+            id="editCategoryName"
+            name="name"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="editCategoryDescription"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Description:</label
+          >
+          <input
+            type="text"
+            id="editCategoryDescription"
+            name="description"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="editCategoryStatus"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Status:</label
+          >
+          <select
+            id="editCategoryStatus"
+            name="status"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition duration-200 font-medium"
+          >
+            Update
+          </button>
+          <button
+            type="button"
+            id="deleteCategoryBtn"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition duration-200 font-medium"
+          >
+            Delete
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
-let categories = []; // Global variable to store fetched categories
+    let categories = []; // Global variable to store fetched categories
 
-// Fetch categories on page load
-document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("editModal").style.display = "none";
-  document.querySelector(".container").classList.add("loaded");
-  fetchCategories();
-});
+    // Fetch categories on page load
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("editModal").style.display = "none";
+      document.getElementById("container").classList.add("opacity-100");
+      fetchCategories();
+    });
 
+    // Function to open the edit modal and pre-fill the form
+    function openEditModal(category) {
+      const editModal = document.getElementById("editModal");
 
-// Function to open the edit modal and pre-fill the form
-function openEditModal(category) {
-  const editModal = document.getElementById("editModal");
-  
+      console.log("Opening edit modal for category:", category); // Debug: Log the category data
 
-  console.log("Opening edit modal for category:", category); // Debug: Log the category data
+      // Pre-fill the form with the category data
+      document.getElementById("editCategoryId").value = category.id;
+      document.getElementById("editCategoryName").value = category.name;
+      document.getElementById("editCategoryDescription").value =
+        category.description;
+      document.getElementById("editCategoryStatus").value = category.status;
 
-  // Pre-fill the form with the category data
-  document.getElementById("editCategoryId").value = category.id;
-  document.getElementById("editCategoryName").value = category.name;
-  document.getElementById("editCategoryDescription").value = category.description;
-  document.getElementById("editCategoryStatus").value = category.status;
+      // Display the modal
+      editModal.style.display = "flex";
+    }
 
-  // Display the modal
-  editModal.style.display = "flex";
-}
+    // Function to close the edit modal
+    function closeEditModal() {
+      const editModal = document.getElementById("editModal");
+      editModal.style.display = "none";
+    }
 
-// Function to close the edit modal
-function closeEditModal() {
-  const editModal = document.getElementById("editModal");
-  editModal.style.display = "none";
-}
+    // Function to handle the edit form submission
+    document
+      .getElementById("editCategoryForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-// Function to handle the edit form submission
-document.getElementById("editCategoryForm").addEventListener("submit", async function (event) {
-  event.preventDefault();
+        const id = document.getElementById("editCategoryId").value;
+        const name = document.getElementById("editCategoryName").value;
+        const description = document.getElementById(
+          "editCategoryDescription"
+        ).value;
+        const status = document.getElementById("editCategoryStatus").value;
 
-  const id = document.getElementById("editCategoryId").value;
-  const name = document.getElementById("editCategoryName").value;
-  const description = document.getElementById("editCategoryDescription").value;
-  const status = document.getElementById("editCategoryStatus").value;
+        const response = await fetch(`/update_category/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, description, status }),
+        });
 
-  const response = await fetch(`/update_category/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, description, status }),
-  });
+        if (response.ok) {
+          fetchCategories(); // Refresh the categories list
+          closeEditModal(); // Close the modal
+        } else {
+          alert("Failed to update category.");
+        }
+      });
 
-  if (response.ok) {
-    fetchCategories(); // Refresh the categories list
-    closeEditModal(); // Close the modal
-  } else {
-    alert("Failed to update category.");
-  }
-});
+    // Function to add event listeners to Edit buttons
+    function addEditButtonListeners() {
+      const editButtons = document.querySelectorAll(".edit-btn");
 
-// Function to add event listeners to Edit buttons
-function addEditButtonListeners() {
-  const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          const categoryId = this.getAttribute("data-id");
+          const category = categories.find((c) => c.id == categoryId);
 
-  editButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-      const categoryId = this.getAttribute("data-id");
-      const category = categories.find(c => c.id == categoryId);
+          if (category) {
+            openEditModal(category);
+          } else {
+            console.error("Category not found for ID:", categoryId);
+          }
+        });
+      });
+    }
 
-      if (category) {
-        openEditModal(category);
-      } else {
-        console.error("Category not found for ID:", categoryId);
+    // Handle Edit form submission
+    document
+      .getElementById("editCategoryForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const id = document.getElementById("editCategoryId").value;
+        const name = document.getElementById("editCategoryName").value;
+        const description = document.getElementById(
+          "editCategoryDescription"
+        ).value;
+        const status = document.getElementById("editCategoryStatus").value;
+
+        try {
+          const response = await fetch(`/update_category/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, description, status }),
+          });
+
+          if (response.ok) {
+            fetchCategories();
+            closeEditModal();
+          } else {
+            alert("Failed to update category.");
+          }
+        } catch (error) {
+          console.error("Error updating category:", error);
+        }
+      });
+
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/get_categories");
+        if (!response.ok) throw new Error("Failed to fetch categories");
+
+        categories = await response.json(); // Update global categories
+        renderTable(categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
       }
-    });
-  });
-}
-
-// Handle Edit form submission
-document.getElementById("editCategoryForm").addEventListener("submit", async function (event) {
-  event.preventDefault();
-
-  const id = document.getElementById("editCategoryId").value;
-  const name = document.getElementById("editCategoryName").value;
-  const description = document.getElementById("editCategoryDescription").value;
-  const status = document.getElementById("editCategoryStatus").value;
-
-  try {
-    const response = await fetch(`/update_category/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description, status }),
-    });
-
-    if (response.ok) {
-      fetchCategories(); // Refresh categories
-      closeEditModal(); // Close modal
-    } else {
-      alert("Failed to update category.");
     }
-  } catch (error) {
-    console.error("Error updating category:", error);
-  }
-});
 
+    function renderTable(data) {
+      const table = document.getElementById("categoryTable");
+      table.innerHTML = "";
 
-  
-   
+      data.forEach((category) => {
+        const statusClass =
+          category.status === "Active" ? "bg-green-500" : "bg-red-500";
 
+        const row = document.createElement("tr");
+        row.className = "hover:bg-gray-50";
+        row.innerHTML = `
+          <td class="py-3 px-4">${category.id}</td>
+          <td class="py-3 px-4 font-medium">${category.name}</td>
+          <td class="py-3 px-4">${category.description}</td>
+          <td class="py-3 px-4">
+            <span class="px-3 py-1 ${statusClass} text-white text-sm rounded-full">${category.status}</span>
+          </td>
+          <td class="py-3 px-4">
+            <button class="edit-btn bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded transition duration-200" data-id="${category.id}">Edit</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
 
-// Function to fetch categories and render the table
-async function fetchCategories() {
-  try {
-    const response = await fetch("/get_categories");
-    if (!response.ok) throw new Error("Failed to fetch categories");
-    
-    categories = await response.json(); // Update global categories
-    renderTable(categories);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
-}
-
-
-// Function to render the table with categories
-function renderTable(data) {
-  const table = document.getElementById("categoryTable");
-  table.innerHTML = ""; // Clear table before re-rendering
-
-  data.forEach((category) => {
-    const statusClass = category.status === "Active" ? "status-active" : "status-inactive";
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${category.id}</td>
-      <td>${category.name}</td>
-      <td>${category.description}</td>
-      <td><button class="status-btn ${statusClass}">${category.status}</button></td>
-      <td><button class="edit-btn" data-id="${category.id}">Edit</button></td>
-    `;
-    table.appendChild(row);
-  });
-
-  addEditButtonListeners(); // Ensure event listeners are attached after rendering
-}
-
-// Function to handle category deletion
-// Function to delete a category
-async function deleteCategory() {
-  const categoryId = document.getElementById("editCategoryId").value;
-  if (!categoryId) {
-    alert("No category selected!");
-    return;
-  }
-
-  const confirmDelete = confirm("Are you sure you want to delete this category?");
-  if (!confirmDelete) return;
-
-  try {
-    const response = await fetch(`/delete_category/${categoryId}`, {
-      method: "DELETE",
-    });
-
-    if (response.ok) {
-      alert("Category deleted successfully.");
-      fetchCategories(); // Refresh categories
-      closeEditModal(); // Close modal
-    } else {
-      alert("Failed to delete category.");
+      addEditButtonListeners();
     }
-  } catch (error) {
-    console.error("Error deleting category:", error);
-  }
-}
 
-// Attach event listener to delete button
-document.getElementById("deleteCategoryBtn").addEventListener("click", deleteCategory);
+    async function deleteCategory() {
+      const categoryId = document.getElementById("editCategoryId").value;
+      if (!categoryId) {
+        alert("No category selected!");
+        return;
+      }
 
+      const confirmDelete = confirm(
+        "Are you sure you want to delete this category?"
+      );
+      if (!confirmDelete) return;
 
+      try {
+        const response = await fetch(`/delete_category/${categoryId}`, {
+          method: "DELETE",
+        });
 
+        if (response.ok) {
+          alert("Category deleted successfully.");
+          fetchCategories(); // Refresh categories
+          closeEditModal(); // Close modal
+        } else {
+          alert("Failed to delete category.");
+        }
+      } catch (error) {
+        console.error("Error deleting category:", error);
+      }
+    }
 
-    
+    document
+      .getElementById("deleteCategoryBtn")
+      .addEventListener("click", deleteCategory);
+
     document.getElementById("search").addEventListener("input", function () {
       const searchTerm = this.value.toLowerCase();
       const filtered = categories.filter((c) =>
@@ -462,8 +408,6 @@ document.getElementById("deleteCategoryBtn").addEventListener("click", deleteCat
           this.reset();
         }
       });
-
-    fetchCategories();
 
     // Get modal element
     document.addEventListener("DOMContentLoaded", function () {

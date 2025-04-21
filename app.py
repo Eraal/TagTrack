@@ -46,7 +46,7 @@ def uploaded_file(filename):
 
 ########################################### ADMIN PAGE ####################################
 
-# Hardcoded admin credentials (No database needed)
+
 ADMIN_CREDENTIALS = {"admin": "123"}
 
 # ------------------ ADMIN LOGIN ROUTE ------------------
@@ -96,8 +96,7 @@ def dashboard():
     total_tagged_items = Item.query.filter(Item.rfid_tag != "None").count()  
     total_items_found = Item.query.filter_by(status='Claimed').count()
   
-    
-    # Fetch lost items grouped by category
+
     lost_items_by_category = (
         db.session.query(Category.name, db.func.count(Item.id))
         .join(Item, Category.id == Item.category_id)
@@ -106,10 +105,9 @@ def dashboard():
         .all()
     )
 
-    # Convert list of tuples to dictionary
     lost_items_by_category_dict = {category: count for category, count in lost_items_by_category}
 
-    # Fetch the latest tagged item
+
     latest_tagged_items = (
         Item.query.filter(Item.rfid_tag == "Tagged", Item.status == "Unclaimed")
         .order_by(Item.date_reported.desc())  # Assuming date_reported is used for latest items
@@ -117,7 +115,6 @@ def dashboard():
         .all()
     )
  
-
     print("Fetched latest tagged lost items:", latest_tagged_items)
 
     return render_template(
@@ -237,6 +234,7 @@ def get_claimed_items():
 ################################# CATEGORIES ####################################################
 
 @app.route('/categories')
+
 def categories():
     categories = Category.query.all()
     print('Go to Categories')
@@ -451,7 +449,7 @@ def get_active_categories():
     return jsonify([{"id": cat.id, "name": cat.name} for cat in categories])
 
 
-#################### LIST ####################################################
+#################### LIST TAG ITEMS ####################################################
 
 @app.route('/api/tagged-items', methods=['GET'])
 def get_tagged_items():
@@ -507,6 +505,80 @@ def get_item_details(item_id):
         "owner_name": owner.name if owner else "Unclaimed",
         "owner_email": owner.email if owner else "N/A"
     })
+
+# routes.py
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
+import os
+from datetime import datetime
+from werkzeug.utils import secure_filename
+from extensions import db
+from models import Item, Category, Location, User, Claim
+
+# Create a blueprint for tagged items functionality
+tagged_items_bp = Blueprint('tagged_items', __name__)
+
+# Render the tagged items page
+@tagged_items_bp.route('/tagged-items')
+def tagged_items_page():
+    return render_template('tagged_items.html')
+
+# API routes for frontend AJAX calls
+@tagged_items_bp.route('/api/tagged-items', methods=['GET'])
+def get_tagged_items():
+    # Query items with RFID tags
+    items_query = db.session.query(
+        Item.id,
+        Item.description,
+        Item.date_reported,
+        Item.image_file,
+        Item.rfid_tag,
+        Item.status,
+        Item.category_id,
+        Item.location_id,
+        Item.owner_id,
+        Category.name.label('category'),
+        Location.name.label('location'),
+        User.name.label('owner_name'),
+        User.email.label('owner_email'),
+        User.student_id.label('owner_student_id'),
+        User.contact_number.label('owner_contact')
+    ).join(
+        Category, Item.category_id == Category.id
+    ).join(
+        Location, Item.location_id == Location.id
+    ).outerjoin(
+        User, Item.owner_id == User.id
+    ).filter(
+        Item.rfid_tag.isnot(None),
+        Item.rfid_tag != ''
+    ).all()
+    
+    # Convert to list of dictionaries
+    items = []
+    for item in items_query:
+        item_dict = {
+            'id': item.id,
+            'description': item.description,
+            'date_reported': item.date_reported.strftime('%Y-%m-%d'),
+            'image_file': item.image_file,
+            'rfid_tag': item.rfid_tag,
+            'status': item.status,
+            'category_id': item.category_id,
+            'location_id': item.location_id,
+            'owner_id': item.owner_id,
+            'category': item.category,
+            'location': item.location,
+            'owner_name': item.owner_name,
+            'owner_email': item.owner_email,
+            'owner_student_id': item.owner_student_id,
+            'owner_contact': item.owner_contact
+        }
+        items.append(item_dict)
+    
+    return jsonify(items)
+
+
+
 
 
 
@@ -596,4 +668,4 @@ def total_found_items():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

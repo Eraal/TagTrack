@@ -1,115 +1,104 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Custom script -->
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+  <!-- Alpine.js for interactive components -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<div class="min-h-screen relative overflow-hidden bg-gray-900">
+  <!-- Video Background -->
+  <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover">
+    <source src="{{ url_for('static', filename='video/intro.mp4') }}" type="video/mp4">
+  </video>
 
-{% block content %}
-<style>
-  /* Fullscreen Login Page */
-  body, html {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #121212;
-    overflow: hidden;
-  }
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-60"></div>
 
-  /* Video Background */
-  .video-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-  }
+  <!-- Login Container -->
+  <div class="relative z-10 flex items-center justify-center min-h-screen px-4">
+    <div class="w-full max-w-md opacity-0 transition-opacity duration-500" id="login-container">
+      <!-- Logo/Branding Area -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-900 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-white">Admin Portal</h1>
+        <p class="text-gray-300 mt-2">Enter your credentials to access the dashboard</p>
+      </div>
 
-  /* Overlay */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-  }
+      <!-- Login Form -->
+      <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-md p-8 rounded-lg shadow-2xl border border-white border-opacity-20">
+        <form method="POST" action="{{ url_for('admin_login') }}" class="space-y-6">
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-200 mb-1">Username</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input type="text" name="username" id="username" required class="block w-full pl-10 pr-3 py-3 border border-white border-opacity-20 rounded-md bg-white bg-opacity-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Admin Username">
+            </div>
+          </div>
 
-  /* Login Container */
-  .login-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 400px;
-    padding: 30px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    transition: opacity 0.5s ease-in-out;
-    opacity: 0;
-  }
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-200 mb-1">Password</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input type="password" name="password" id="password" required class="block w-full pl-10 pr-3 py-3 border border-white border-opacity-20 rounded-md bg-white bg-opacity-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Password">
+            </div>
+          </div>
 
-  .login-container.loaded {
-    opacity: 1;
-  }
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+              <label for="remember-me" class="ml-2 block text-sm text-gray-300">
+                Remember me
+              </label>
+            </div>
+            
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-300 hover:text-indigo-200">
+                Forgot password?
+              </a>
+            </div>
+          </div>
 
-  .login-container h2 {
-    color: white;
-    margin-bottom: 20px;
-    font-size: 24px;
-  }
+          <div>
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-800 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+              Sign in
+            </button>
+          </div>
+        </form>
+      </div>
 
-  .login-container input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-
-  .login-container button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    background: navy;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  .login-container button:hover {
-    background: darkblue;
-  }
-</style>
-
-<!-- Video Background -->
-<video autoplay muted loop class="video-bg">
-  <source src="{{ url_for('static', filename='video/intro.mp4') }}" type="video/mp4">
-</video>
-
-<!-- Overlay -->
-<div class="overlay"></div>
-
-<!-- Login Form -->
-<div class="login-container">
-  <h2>🔑 Admin Login</h2>
-  <form method="POST" action="{{ url_for('admin_login') }}">
-    <input type="text" name="username" placeholder="Admin Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
+      <!-- Footer -->
+      <div class="mt-6 text-center text-sm text-gray-400">
+        <p>© 2025 Lost and Found System. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+</html>
 
 <script>
   // Smooth fade-in effect
   document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector(".login-container").classList.add("loaded");
+    document.getElementById("login-container").classList.add("opacity-100");
   });
 </script>
-
-{% endblock %}

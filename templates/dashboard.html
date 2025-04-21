@@ -1,103 +1,188 @@
-{% extends "base.html" %}
-
-{% block title %}Dashboard - TagTrack{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Dashboard - TagTrack{% endblock %} {%
+block content %}
 
 <!-- Header -->
-<div class="header">
-    <h2>Dashboard</h2>
-    <h3>Admin</h3>
+<div class="bg-white p-6 shadow-sm rounded-lg mb-6">
+  <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+  <h3 class="text-lg text-gray-600"></h3>
 </div>
 
 <!-- Dashboard Cards -->
-<div class="dashboard-cards">
-    <!-- ITEM ENTRY / Active -->
-    <div class="card">
-        <div class="card-icon">
-            <img src="{{ url_for('static', filename='images/itementry.png') }}" alt="Item Entry Icon">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <!-- ITEM ENTRY / Active -->
+  <div
+    class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+  >
+    <div class="flex p-4">
+      <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3 mr-4">
+        <img
+          class="w-10 h-10"
+          src="{{ url_for('static', filename='images/itementry.png') }}"
+          alt="Item Entry Icon"
+        />
+      </div>
+      <div>
+        <div class="text-sm font-medium text-gray-500">ITEM ENTRY / Active</div>
+        <div class="text-2xl font-bold text-gray-800">
+          {{ total_items_active }}
         </div>
-        <div class="card-content">
-            <div class="card-title">ITEM ENTRY / Active</div>
-            <div class="card-value">{{ total_items_active }}</div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- TOTAL TAG ITEMS -->
-    <div class="card">
-        <div class="card-icon">
-            <img src="{{ url_for('static', filename='images/totaltagitems.png') }}" alt="Total Tag Items Icon">
+  <!-- TOTAL TAG ITEMS -->
+  <div
+    class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+  >
+    <div class="flex p-4">
+      <div class="flex-shrink-0 bg-green-100 rounded-lg p-3 mr-4">
+        <img
+          class="w-10 h-10"
+          src="{{ url_for('static', filename='images/totaltagitems.png') }}"
+          alt="Total Tag Items Icon"
+        />
+      </div>
+      <div>
+        <div class="text-sm font-medium text-gray-500">TOTAL TAG ITEMS</div>
+        <div class="text-2xl font-bold text-gray-800">
+          {{ total_tagged_items }}
         </div>
-        <div class="card-content">
-            <div class="card-title">TOTAL TAG ITEMS</div>
-            <div class="card-value">{{ total_tagged_items }}</div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- TOTAL ITEM LOST -->
-    <div class="card">
-        <div class="card-icon">
-            <img src="{{ url_for('static', filename='images/totalitemlost.png') }}" alt="Total Lost Items Icon">
+  <!-- TOTAL ITEM LOST -->
+  <div
+    class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+  >
+    <div class="flex p-4">
+      <div class="flex-shrink-0 bg-red-100 rounded-lg p-3 mr-4">
+        <img
+          class="w-10 h-10"
+          src="{{ url_for('static', filename='images/totalitemlost.png') }}"
+          alt="Total Lost Items Icon"
+        />
+      </div>
+      <div>
+        <div class="text-sm font-medium text-gray-500">TOTAL ITEM LOST</div>
+        <div class="text-2xl font-bold text-gray-800">
+          {{ total_items_lost }}
         </div>
-        <div class="card-content">
-            <div class="card-title">TOTAL ITEM LOST</div>
-            <div class="card-value">{{ total_items_lost }}</div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- TOTAL ITEM FOUND -->
-    <div class="card">
-        <div class="card-icon">
-            <img src="{{ url_for('static', filename='images/totalfounditem.png') }}" alt="Total Found Items Icon">
+  <!-- TOTAL ITEM FOUND -->
+  <div
+    class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+  >
+    <div class="flex p-4">
+      <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3 mr-4">
+        <img
+          class="w-10 h-10"
+          src="{{ url_for('static', filename='images/totalfounditem.png') }}"
+          alt="Total Found Items Icon"
+        />
+      </div>
+      <div>
+        <div class="text-sm font-medium text-gray-500">TOTAL ITEM FOUND</div>
+        <div class="text-2xl font-bold text-gray-800">
+          {{ total_items_found }}
         </div>
-        <div class="card-content">
-            <div class="card-title">TOTAL ITEM FOUND</div>
-            <div class="card-value">{{ total_items_found }}</div>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Lost Items by Category Chart and Latest Tagged Items -->
-<div class="dashboard-grid">
-  <!-- Existing Lost Items Chart -->
-  <div class="chart-container">
-      <h3>Lost Items by Category</h3>
-      <canvas id="lostItemsChart"></canvas>
-  </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Charts Container -->
+  <div class="space-y-6">
+    <!-- Lost Items Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        Lost Items by Category
+      </h3>
+      <div class="h-64">
+        <canvas id="lostItemsChart"></canvas>
+      </div>
+    </div>
 
-  <!-- New Found Items by Location Chart -->
-  <div class="chart-container">
-      <h3>Number of Lost Items by Location</h3>
-      <canvas id="foundItemsChart"></canvas>
+    <!-- Found Items by Location Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        Number of Lost Items by Location
+      </h3>
+      <div class="h-64">
+        <canvas id="foundItemsChart"></canvas>
+      </div>
+    </div>
   </div>
 
   <!-- Latest Tagged Items Table -->
-  <div class="latest-tagged-items">
-      <h3>📢 NOTICE: UNCLAIMED TAGGED ITEM</h3>
-      <table>
-          <thead>
-              <tr>
-                  <th>Description</th>
-                  <th>Location</th>
-                  <th>Status</th>
-              </tr>
-          </thead>
-          <tbody>
-              {% if latest_tagged_items %}
-                  {% for item in latest_tagged_items %}
-                      <tr>
-                          <td>{{ item.description }}</td>
-                          <td>{{ item.location.name if item.location else 'Unknown' }}</td>
-                          <td class="status-{{ item.status.lower() | replace(' ', '-') }}">{{ item.status }}</td>
-                      </tr>
-                  {% endfor %}
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+      <span class="mr-2">📢</span> NOTICE: UNCLAIMED TAGGED ITEM
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white">
+        <thead class="bg-gray-100">
+          <tr>
+            <th
+              class="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
+            >
+              Description
+            </th>
+            <th
+              class="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
+            >
+              Location
+            </th>
+            <th
+              class="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
+            >
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% if latest_tagged_items %} {% for item in latest_tagged_items %}
+          <tr class="hover:bg-gray-50">
+            <td class="py-3 px-4 text-sm text-gray-700">
+              {{ item.description }}
+            </td>
+            <td class="py-3 px-4 text-sm text-gray-700">
+              {{ item.location.name if item.location else 'Unknown' }}
+            </td>
+            <td class="py-3 px-4">
+              {% if item.status == 'Lost' %}
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
+                >{{ item.status }}</span
+              >
+              {% elif item.status == 'Found' %}
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
+                >{{ item.status }}</span
+              >
               {% else %}
-                  <tr>
-                      <td colspan="3" class="no-data">No recently tagged items.</td>
-                  </tr>
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
+                >{{ item.status }}</span
+              >
               {% endif %}
-          </tbody>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="3" class="py-4 px-4 text-sm text-gray-500 text-center">
+              No recently tagged items.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
       </table>
+    </div>
   </div>
 </div>
 
@@ -106,88 +191,89 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+      fetch('/found-items-by-location')
+          .then(response => response.json())
+          .then(data => {
+              const locations = data.map(item => item.location);
+              const counts = data.map(item => item.count);
 
-document.addEventListener("DOMContentLoaded", function () {
-    fetch('/found-items-by-location')
-        .then(response => response.json())
-        .then(data => {
-            const locations = data.map(item => item.location);
-            const counts = data.map(item => item.count);
+              const ctx = document.getElementById('foundItemsChart').getContext('2d');
+              new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: locations,
+                      datasets: [{
+                          label: 'Lost Items',
+                          data: counts,
+                          backgroundColor: 'rgba(200, 80, 80, 0.6)',
+                          borderColor: 'rgba(235, 54, 54, 1)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              title: {
+                                  display: true,
+                                  text: 'Number of Lost Items'
+                              }
+                          },
+                          x: {
+                              title: {
+                                  display: true,
+                                  text: 'Location'
+                              }
+                          }
+                      }
+                  }
+              });
+          })
+          .catch(error => console.error("Error fetching chart data:", error));
 
-            const ctx = document.getElementById('foundItemsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: locations,
-                    datasets: [{
-                        label: 'Lost Items',
-                        data: counts,
-                        backgroundColor: 'rgba(200, 80, 80, 0.6)',
-                        borderColor: 'rgba(235, 54, 54, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Lost Items'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Location'
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => console.error("Error fetching chart data:", error));
-});
+      var lostItemsData = {{ lost_items_by_category | tojson | safe }};
+      var labels = Object.keys(lostItemsData);
+      var values = Object.values(lostItemsData);
 
-    var lostItemsData = {{ lost_items_by_category | tojson | safe }};
-    var labels = Object.keys(lostItemsData);
-    var values = Object.values(lostItemsData);
-
-    if (labels.length > 0) {
-        var ctx = document.getElementById('lostItemsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                animation: {
-                    animateRotate: true,
-                    animateScale: true
-                },
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    datalabels: {
-                        color: '#000',
-                        font: { weight: 'bold' },
-                        formatter: (value, ctx) => value
-                    }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
-    } else {
-        console.log("No lost items data available.");
-    }
+      if (labels.length > 0) {
+          var ctx = document.getElementById('lostItemsChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'pie',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      data: values,
+                      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                      hoverOffset: 6
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  animation: {
+                      animateRotate: true,
+                      animateScale: true
+                  },
+                  plugins: {
+                      legend: {
+                          position: 'top'
+                      },
+                      datalabels: {
+                          color: '#000',
+                          font: { weight: 'bold' },
+                          formatter: (value, ctx) => value
+                      }
+                  }
+              },
+              plugins: [ChartDataLabels]
+          });
+      } else {
+          console.log("No lost items data available.");
+      }
+  });
 </script>
 
 {% endblock %}

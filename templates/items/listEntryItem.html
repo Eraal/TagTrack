@@ -2,357 +2,264 @@
 
 {% block content %}
 
-<style>
-    /* General Styles */
-
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 0;
-        
-    }
-
-    .container {
-        width: 95%;
-        margin: 20px auto;
-        opacity: 0;
-        transition: opacity 0.3s ease-in;
-    }
-
-    .container.loaded{
-        opacity: 1;
-    }
-
-    .page-title {
-        margin: auto;
-        margin-left: 50px;
-        font-weight: lighter;
-    }
-
-    /* Filter Bar */
-    .filter-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-
-    .filter-bar input {
-        padding: 8px;
-        width: 30%;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    .filters {
-        display: flex;
-        gap: 10px;
-    }
-
-    .filters select, .filters button {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    /* Items Grid */
-    .items-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-        padding: 10px;
-    }
-
-    .item-card {
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        overflow: hidden;
-    }
-
-    .item-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .item-card img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 8px;
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    .item-card img:hover {
-        opacity: 0.9;
-    }
-
-    .item-info {
-        padding: 10px;
-        width: 100%;
-    }
-
-    .item-info p {
-        margin: 6px 0;
-        font-size: 14px;
-        color: #444;
-    }
-
-    .item-info strong {
-        color: #222;
-    }
-
-    /* Status Styling */
-    .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .status.unclaimed {
-        background-color: #ffdddd;
-        color: #c00;
-    }
-
-    .status.claimed {
-        background-color: #ddffdd;
-        color: #080;
-    }
-
-    /* Buttons */
-    .add-item-btn, .edit-btn {
-        background: navy;
-        color: white;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background 0.3s ease-in-out;
-    }
-
-    .add-item-btn:hover, .edit-btn:hover {
-        background: darkblue;
-    }
-
-    /* Modal Styling */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .close {
-        float: right;
-        font-size: 24px;
-        cursor: pointer;
-    }
-
-    .close:hover {
-        color: red;
-    }
-
-    .modal form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .modal form input, 
-    .modal form select {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .modal form button {
-        background: navy;
-        color: white;
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .modal form button:hover {
-        background: darkblue;
-    }
-
-    /* Responsive Grid */
-    @media (max-width: 768px) {
-        .items-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        }
-    }
-
-    .spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: navy;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-</style>
-
-
-
-
-<div class="header">
-    <h2 class="page-title">📦 Items Management</h2>
-    <h2>Admin</h2>
+<div class="px-6 py-4 border-b border-gray-200 bg-white shadow-sm">
+    <h2 class="text-2xl font-bold">Items Management</h2>
+    <h2 class="text-lg text-gray-600">Items / List Items</h2>
 </div>
 
-<h3 class="page-title"><i>Items / List Items</i></h3>
 
-<div class="container">
-    <!-- Search and Filters -->
-    <div class="filter-bar">
-        <input type="text" id="search" placeholder="🔍 Search items..." onkeyup="filterItems()">
-        <div class="filters">
-            <select id="filter-rfid-tag" onchange="filterItems()">
+<div class="w-[95%] mx-auto my-5 opacity-0 transition-opacity duration-300" id="main-container">
+    <!-- Search and Filters Bar -->
+    <div class="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm mb-6">
+        <input 
+            type="text" 
+            id="search" 
+            placeholder="🔍 Search items..." 
+            class="w-full md:w-1/3 p-2 border border-gray-300 rounded-md mb-3 md:mb-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onkeyup="filterItems()">
+        
+        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+            <select 
+                id="filter-rfid-tag" 
+                class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="filterItems()">
                 <option value="">🏷️ All Items</option>
                 <option value="Tagged">🔖 Tagged</option>
                 <option value="None">🚫 None</option>
             </select>
-            <select id="filter-status" onchange="filterItems()">
+            
+            <select 
+                id="filter-status" 
+                class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="filterItems()">
                 <option value="">📌 By Status</option>
                 <option value="Unclaimed">❌ Unclaimed</option>
                 <option value="Claimed">✅ Claimed</option>
             </select>
-            <select id="location-filter" onchange="filterItems()">
+            
+            <select 
+                id="location-filter" 
+                class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="filterItems()">
                 <option value="">📍 All Locations</option>
             </select>
-            <select id="date-filter" onchange="filterItems()">
+            
+            <select 
+                id="date-filter" 
+                class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="filterItems()">
                 <option value="">📅 All Dates</option>
                 <option value="Newest">⬆️ Newest</option>
                 <option value="Oldest">⬇️ Oldest</option>
             </select>
-            <button class="add-item-btn" onclick="openAddItemModal()">➕ Add New Item</button>
+            
+            <button 
+                class="p-2 bg-blue-800 hover:bg-blue-900 text-white rounded-md transition-colors duration-200"
+                onclick="openAddItemModal()">
+                ➕ Add New Item
+            </button>
         </div>
     </div>
 
     <!-- Items Grid -->
-    <div id="items-container" class="items-grid">
-        <p style="text-align: center; color: #777;">Loading items...</p>
+    <div id="items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-2">
+        <div class="flex items-center justify-center col-span-full">
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-8 h-8 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-gray-500">Loading items...</p>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Add Item Modal -->
-<div id="addItemModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAddItemModal()">&times;</span>
-        <h2>Add New Item</h2>
-        <form id="addItemForm" enctype="multipart/form-data">
-            <label>Category:</label>
-            <select id="category" required>
-                <option value="">Select Category</option>
-                {% for cat in categories %}
-                    <option value="{{ cat.id }}">{{ cat.name }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Location:</label>
-            <select id="location" required>
-                <option value="">Select Location</option>
-                {% for loc in locations %}
-                    <option value="{{ loc.id }}">{{ loc.name }}</option>
-                {% endfor %}
-            </select>
-
-            <input type="text" id="description" placeholder="Description" required>
-            <input type="date" id="date" required>
-            <label>Status:</label>
-            <select id="status">
-                <option value="Unclaimed">Unclaimed</option>
-                <option value="Claimed">Claimed</option>
-            </select>
-            <label>RFID Tag:</label>
-<select id="rfid_tag">
-    <option value="None">None</option>
-    <option value="Tagged">Tagged</option>
-</select>
-
+<div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Add New Item</h2>
+            <button 
+                onclick="closeAddItemModal()" 
+                class="text-2xl text-gray-500 hover:text-red-500 focus:outline-none"
+                aria-label="Close">&times;</button>
+        </div>
+        
+        <form id="addItemForm" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+                <select 
+                    id="category" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+                    <option value="">Select Category</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             
-            <label>Upload Image:</label>
-            <input type="file" id="image" name="image" accept="image/*">
-            <button type="submit">Create Entry</button>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Location:</label>
+                <select 
+                    id="location" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+                    <option value="">Select Location</option>
+                    {% for loc in locations %}
+                        <option value="{{ loc.id }}">{{ loc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <input 
+                    type="text" 
+                    id="description" 
+                    placeholder="Description" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date:</label>
+                <input 
+                    type="date" 
+                    id="date" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                <select 
+                    id="status" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="Unclaimed">Unclaimed</option>
+                    <option value="Claimed">Claimed</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">RFID Tag:</label>
+                <select 
+                    id="rfid_tag" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="None">None</option>
+                    <option value="Tagged">Tagged</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Upload Image:</label>
+                <input 
+                    type="file" 
+                    id="image" 
+                    name="image" 
+                    accept="image/*"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <button 
+                type="submit" 
+                class="w-full p-2 bg-blue-800 hover:bg-blue-900 text-white rounded-md transition-colors duration-200">
+                Create Entry
+            </button>
         </form>
     </div>
 </div>
 
 <!-- Edit Item Modal -->
-<div id="editItemModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeEditItemModal()">&times;</span>
-        <h2>Edit Item</h2>
-        <form id="editItemForm" enctype="multipart/form-data">
+<div id="editItemModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Edit Item</h2>
+            <button 
+                onclick="closeEditItemModal()" 
+                class="text-2xl text-gray-500 hover:text-red-500 focus:outline-none"
+                aria-label="Close">&times;</button>
+        </div>
+        
+        <form id="editItemForm" enctype="multipart/form-data" class="space-y-4">
             <input type="hidden" id="edit_item_id">
-            <label>Category:</label>
-            <select id="edit_category" required></select>
-            <label>Location:</label>
-            <select id="edit_location" required></select>
-            <input type="text" id="edit_description" placeholder="Description" required>
-            <input type="date" id="edit_date" required>
-            <label>Status:</label>
-            <select id="edit_status">
-                <option value="Unclaimed">Unclaimed</option>
-                <option value="Claimed">Claimed</option>
-            </select>
-            <label>RFID Tag:</label>
-<select id="edit_rfid_tag">
-    <option value="None">None</option>
-    <option value="Tagged">Tagged</option>
-</select>
-
-            <label>Change Image:</label>
-            <input type="file" id="edit_image" name="edit_image" accept="image/*">
-            <button type="submit">Update Item</button>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+                <select 
+                    id="edit_category" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Location:</label>
+                <select 
+                    id="edit_location" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                <input 
+                    type="text" 
+                    id="edit_description" 
+                    placeholder="Description" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date:</label>
+                <input 
+                    type="date" 
+                    id="edit_date" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                <select 
+                    id="edit_status" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="Unclaimed">Unclaimed</option>
+                    <option value="Claimed">Claimed</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">RFID Tag:</label>
+                <select 
+                    id="edit_rfid_tag" 
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="None">None</option>
+                    <option value="Tagged">Tagged</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Change Image:</label>
+                <input 
+                    type="file" 
+                    id="edit_image" 
+                    name="edit_image" 
+                    accept="image/*"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <button 
+                type="submit" 
+                class="w-full p-2 bg-blue-800 hover:bg-blue-900 text-white rounded-md transition-colors duration-200">
+                Update Item
+            </button>
         </form>
     </div>
 </div>
 
-
 <script>
-
-   document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector(".container").classList.add("loaded");
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("main-container").classList.add("opacity-100");
     fetchItems();
     fetchCategories(); // Populate the category dropdown
     fetchLocations(); // Populate the location dropdown and location filter
@@ -382,7 +289,6 @@ async function fetchCategories(dropdownId = "category", selectedId = null) {
             const option = document.createElement("option");
             option.value = cat.id;
             option.textContent = cat.name;
-
             
             if (selectedId && String(cat.id) === String(selectedId)) {
                 option.selected = true;
@@ -393,13 +299,6 @@ async function fetchCategories(dropdownId = "category", selectedId = null) {
         console.error("Error fetching categories:", error);
     }
 }
-
-
-
-
-
-
-
 
 async function fetchLocations(dropdownId = "location-filter", selectedId = null) {
     try {
@@ -437,39 +336,44 @@ async function fetchLocations(dropdownId = "location-filter", selectedId = null)
     }
 }
 
-// Ensure the function runs when the page loads
-document.addEventListener("DOMContentLoaded", () => fetchLocations());
-
-
-
-
-
-
-
 function renderItems(items) {
     const container = document.getElementById("items-container");
-    container.innerHTML = items.length === 0 ? "<p>No items found.</p>" : items.map(item => `
-        <div class="item-card">
-            <img src="/uploads/${item.image_file}" onerror="this.src='default.jpg'" alt="Item Image">
-            <div class="item-info">
-                <p><strong>Category:</strong> ${item.category}</p>
-                <p><strong>Description:</strong> ${item.description}</p>
-                <p><strong>Location:</strong> ${item.location}</p>
-                <p><strong>Date Reported:</strong> ${item.date_reported}</p>
-                <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
-                <p><strong>RFID Tag:</strong> ${item.rfid_tag || "Not Tagged"}</p>
-                <button class="edit-btn" onclick="openEditItemModal(${item.id})">Edit Details</button>
+    
+    if (items.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">No items found.</p>';
+        return;
+    }
+    
+    container.innerHTML = items.map(item => `
+        <div class="bg-white rounded-lg shadow-md overflow-hidden transition transform duration-200 hover:shadow-lg hover:-translate-y-1 flex flex-col">
+            <img 
+                src="/uploads/${item.image_file}" 
+                onerror="this.src='default.jpg'" 
+                alt="Item Image"
+                class="w-full h-48 object-cover">
+            <div class="p-4 flex-grow flex flex-col">
+                <p class="mb-1"><span class="font-semibold text-gray-700">Category:</span> ${item.category}</p>
+                <p class="mb-1"><span class="font-semibold text-gray-700">Description:</span> ${item.description}</p>
+                <p class="mb-1"><span class="font-semibold text-gray-700">Location:</span> ${item.location}</p>
+                <p class="mb-1"><span class="font-semibold text-gray-700">Date Reported:</span> ${item.date_reported}</p>
+                <p class="mb-3">
+                    <span class="font-semibold text-gray-700">Status:</span> 
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                        item.status.toLowerCase() === 'claimed' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                    }">${item.status}</span>
+                </p>
+                <p class="mb-4"><span class="font-semibold text-gray-700">RFID Tag:</span> ${item.rfid_tag || "Not Tagged"}</p>
+                <button 
+                    class="mt-auto p-2 bg-blue-800 hover:bg-blue-900 text-white rounded-md transition-colors duration-200"
+                    onclick="openEditItemModal(${item.id})">
+                    Edit Details
+                </button>
             </div>
         </div>
     `).join("");
 }
-
-
-
-
-
-
-
 
 function filterItems() {
     const search = document.getElementById("search").value.toLowerCase();
@@ -501,13 +405,11 @@ function filterItems() {
         .catch(error => console.error("Error filtering items:", error));
 }
 
-
-
 // Open Add Item Modal
 function openAddItemModal() {
     document.getElementById("addItemModal").style.display = "flex";
     fetchCategories();
-    fetchLocations();
+    fetchLocations("location", null);
 }
 
 // Close Add Item Modal
@@ -548,16 +450,6 @@ document.getElementById("addItemForm").addEventListener("submit", async function
     }
 });
 
-
-
-
-
-
-
-
-
-
-
 // Open Edit Item Modal and Pre-fill Data
 async function openEditItemModal(itemId) {
     try {
@@ -579,7 +471,6 @@ async function openEditItemModal(itemId) {
         document.getElementById("edit_status").value = item.status;
         document.getElementById("edit_rfid_tag").value = item.rfid_tag === "Tagged" ? "Tagged" : "None";
 
-
         // Show the modal
         document.getElementById("editItemModal").style.display = "flex";
     } catch (error) {
@@ -593,14 +484,12 @@ function closeEditItemModal() {
     document.getElementById("editItemModal").style.display = "none";
 }
 
-// Handle Edit Form Submission
 document.getElementById("editItemForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const itemId = document.getElementById("edit_item_id").value;
     const formData = new FormData();
 
-    // Append only the fields that have been changed
     const description = document.getElementById("edit_description").value;
     const date = document.getElementById("edit_date").value;
     const status = document.getElementById("edit_status").value;
@@ -641,7 +530,6 @@ document.getElementById("editItemForm").addEventListener("submit", async functio
         alert("An error occurred while updating the item.");
     }
 });
-
 </script>
 
 {% endblock %}

@@ -1,372 +1,261 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% block content %}
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-  }
-
-  .container {
-    width: 95%;
-    margin: 20px auto;
-    opacity: 0;
-    transition: opacity 0.3s ease-in;
-  }
-
-  .container.loaded {
-    opacity: 1;
-  }
-
-  .page-title {
-    margin: auto;
-    margin-left: 50px;
-    font-weight: lighter;
-  }
-
-  .filter-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-
-  .filter-bar input {
-    padding: 8px;
-    width: 30%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .filters {
-    display: flex;
-    gap: 10px;
-  }
-
-  .filters select,
-  .filters button {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
-    padding: 10px;
-  }
-
-  .item-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .item-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .item-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    transition: opacity 0.3s ease-in-out;
-  }
-
-  .item-card img:hover {
-    opacity: 0.9;
-  }
-
-  .item-info {
-    padding: 10px;
-    width: 100%;
-  }
-
-  .item-info p {
-    margin: 6px 0;
-    font-size: 14px;
-    color: #444;
-  }
-
-  .item-info strong {
-    color: #222;
-  }
-
-  .status {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-
-  .status.unclaimed {
-    background-color: #ffdddd;
-    color: #c00;
-  }
-
-  .status.claimed {
-    background-color: #ddffdd;
-    color: #080;
-  }
-
-  .edit-btn {
-    background: navy;
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease-in-out;
-    margin-top: 10px;
-  }
-
-  .edit-btn:hover {
-    background: darkblue;
-  }
-
-  @media (max-width: 768px) {
-    .items-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-  }
-
-
-/* Modal Background */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed;
-  z-index: 10;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* Modal Box */
-.modal-content {
-  background: white;
-  width: 90%;
-  max-width: 800px; /* Increased width */
-  padding: 30px; /* Increased padding */
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  position: relative;
-  text-align: left; /* Align text to the left */
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Close Button */
-.close {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  font-size: 28px;
-  cursor: pointer;
-  color: #333;
-  transition: color 0.2s;
-}
-
-.close:hover {
-  color: red;
-}
-
-/* Modal Body */
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 20px; /* Increased gap between elements */
-}
-
-/* Modal Image */
-#modal-image {
-  width: 100%;
-  max-height: 300px; /* Increased height */
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 20px; /* Increased margin */
-}
-
-/* Details Container (Two-Column Layout) */
-.details-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  text-align: left;
-  gap: 30px; /* Increased gap between columns */
-}
-
-/* Individual Sections */
-.item-details,
-.owner-details {
-  width: 50%;
-  background: #f5f5f5;
-  padding: 20px; /* Increased padding */
-  border-radius: 8px;
-}
-
-/* Section Headings */
-.item-details h3,
-.owner-details h3 {
-  font-size: 20px; /* Increased font size */
-  margin-bottom: 15px; /* Increased margin */
-  color: #333;
-}
-
-/* Paragraphs */
-.item-details p,
-.owner-details p {
-  margin: 10px 0; /* Increased margin */
-  font-size: 16px; /* Increased font size */
-  color: #555;
-  line-height: 1.6; /* Improved line spacing */
-}
-
-/* Strong Text */
-.item-details strong,
-.owner-details strong {
-  color: #222;
-  font-weight: 600;
-}
-
-/* Close Button */
-.close-btn {
-  background: navy;
-  color: white;
-  padding: 12px 24px; /* Increased padding */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px; /* Increased font size */
-  margin-top: 20px; /* Increased margin */
-  transition: background 0.3s;
-}
-
-.close-btn:hover {
-  background: darkblue;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-</style>
-
-
-
-
-
-
-<div class="header">
-  <h2 class="page-title">📦 Items Management</h2>
-  <h2>Admin</h2>
+<div class="px-6 py-4 border-b border-gray-200 bg-white shadow-sm">
+  <h2 class="text-2xl font-bold">Items Management</h2>
+  <h2 class="text-lg text-gray-600">Items / List Tagged Items</h2>
 </div>
-<h3 class="page-title"><i>Items / List Tagged Items</i></h3>
-<div class="container">
-  <!-- Search and Filters -->
-  <div class="filter-bar">
-    <input
-      type="text"
-      id="search"
-      placeholder="Search..."
-      onkeyup="filterItems()"
-    />
-    <div class="filters">
-      <select id="filter-status" onchange="filterItems()">
-        <option value="">📌 By Status</option>
-        <option value="Unclaimed">❌ Unclaimed</option>
-        <option value="Claimed">✅ Claimed</option>
-      </select>
-      <select id="location-filter"></select>
-      <select id="date-filter">
-        <option value="">📅 All Dates</option>
-        <option value="Newest">⬆️Newest</option>
-        <option value="Oldest">⬇️Oldest</option>
-      </select>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="px-4 py-6 md:px-8">
+    <!-- Header -->
+    
+
+    <!-- Main container -->
+    <div id="mainContainer" class="w-11/12 mx-auto opacity-0 transition-opacity duration-300">
+      <!-- Search and Filters -->
+      <div class="flex flex-col md:flex-row justify-between items-center p-4 bg-white rounded-lg shadow-sm mb-6">
+        <input
+          type="text"
+          id="search"
+          placeholder="Search..."
+          class="px-4 py-2 border border-gray-300 rounded-md mb-3 md:mb-0 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onkeyup="filterItems()"
+        />
+        <div class="flex flex-wrap gap-3">
+          <select id="filter-status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none" onchange="filterItems()">
+            <option value="">📌 By Status</option>
+            <option value="Unclaimed">❌ Unclaimed</option>
+            <option value="Claimed">✅ Claimed</option>
+          </select>
+          <select id="location-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none"></select>
+          <select id="date-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none" onchange="filterItems()">
+            <option value="">📅 All Dates</option>
+            <option value="Newest">⬆️ Newest</option>
+            <option value="Oldest">⬇️ Oldest</option>
+          </select>
+          
+        </div>
+        <div class="mb-6">
+          <button id="addItemBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Tagged Item
+          </button>
+        </div>
+  
+      </div>
+
+      <!-- Add Item Button -->
+      
+      <!-- Items Grid -->
+      <div id="items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </div>
   </div>
-
-  <div id="items-container" class="items-grid"></div>
 </div>
 
-
-
-
-<!-- Modal Structure -->
-<div id="itemModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2 id="modal-title">Item Details</h2>
-    <div class="modal-body">
-      <img id="modal-image" src="" alt="Item Image">
+<!-- Item Details Modal -->
+<div id="itemModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center backdrop-blur-sm">
+  <div class="bg-white w-11/12 max-w-4xl p-6 rounded-xl shadow-lg relative animate-fadeIn">
+    <button class="absolute right-5 top-5 text-3xl text-gray-600 hover:text-red-600 transition duration-200" onclick="closeModal()">×</button>
+    <h2 id="modal-title" class="text-2xl font-bold mb-4 pr-8">Item Details</h2>
+    
+    <div class="flex flex-col lg:flex-row gap-6">
+      <img id="modal-image" src="" alt="Item Image" class="w-full lg:w-2/5 h-64 object-cover rounded-lg">
       
-      <div class="details-container">
+      <div class="w-full lg:w-3/5 space-y-6">
         <!-- Item Details -->
-        <div class="item-details">
-          <h3>📦 Item Information</h3>
-          <p><strong>Category:</strong> <span id="modal-category"></span></p>
-          <p><strong>Description:</strong> <span id="modal-description"></span></p>
-          <p><strong>Location:</strong> <span id="modal-location"></span></p>
-          <p><strong>Date Reported:</strong> <span id="modal-date"></span></p>
-          <p><strong>Status:</strong> <span id="modal-status"></span></p>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold mb-3 text-gray-800">📦 Item Information</h3>
+          <div class="space-y-2">
+            <p><span class="font-medium text-gray-700">Category:</span> <span id="modal-category"></span></p>
+            <p><span class="font-medium text-gray-700">Description:</span> <span id="modal-description"></span></p>
+            <p><span class="font-medium text-gray-700">Location:</span> <span id="modal-location"></span></p>
+            <p><span class="font-medium text-gray-700">Date Reported:</span> <span id="modal-date"></span></p>
+            <p><span class="font-medium text-gray-700">RFID Tag:</span> <span id="modal-rfid"></span></p>
+            <p><span class="font-medium text-gray-700">Status:</span> <span id="modal-status" class="px-2 py-1 rounded text-sm font-medium"></span></p>
+          </div>
         </div>
 
         <!-- Owner Details -->
-<div class="owner-details">
-  <h3>👤 Owner Information</h3>
-  <p><strong>Name:</strong> <span id="modal-owner-name"></span></p>
-  <p><strong>Email:</strong> <span id="modal-owner-email"></span></p>
-  <p><strong>Student ID:</strong> <span id="modal-owner-student-id"></span></p>
-  <p><strong>Contact Number:</strong> <span id="modal-owner-contact"></span></p>
-</div>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold mb-3 text-gray-800">👤 Owner Information</h3>
+          <div class="space-y-2">
+            <p><span class="font-medium text-gray-700">Name:</span> <span id="modal-owner-name"></span></p>
+            <p><span class="font-medium text-gray-700">Email:</span> <span id="modal-owner-email"></span></p>
+            <p><span class="font-medium text-gray-700">Student ID:</span> <span id="modal-owner-student-id"></span></p>
+            <p><span class="font-medium text-gray-700">Contact Number:</span> <span id="modal-owner-contact"></span></p>
+          </div>
+        </div>
       </div>
     </div>
-    <button class="close-btn" onclick="closeModal()">Close</button>
+    
+    <div class="mt-6 flex justify-end gap-3">
+      <button class="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded transition duration-300" onclick="closeModal()">
+        Close
+      </button>
+      <button id="editItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-300">
+        Edit Item
+      </button>
+    </div>
   </div>
 </div>
 
-
-
+<!-- Add/Edit Item Modal -->
+<div id="addEditItemModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center backdrop-blur-sm">
+  <div class="bg-white w-11/12 max-w-3xl p-6 rounded-xl shadow-lg relative animate-fadeIn overflow-y-auto max-h-90vh">
+    <button class="absolute right-5 top-5 text-3xl text-gray-600 hover:text-red-600 transition duration-200" onclick="closeAddEditModal()">×</button>
+    <h2 id="addEditModalTitle" class="text-2xl font-bold mb-6 pr-8">Add Tagged Item</h2>
+    
+    <form id="itemForm" class="space-y-6">
+      <input type="hidden" id="itemId" name="itemId">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Column -->
+        <div class="space-y-4">
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select id="category" name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+          </div>
+          
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea id="description" name="description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+          
+          <div>
+            <label for="locationSelect" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <select id="locationSelect" name="location" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+          </div>
+          
+          <div>
+            <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date Reported</label>
+            <input type="date" id="date" name="date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="space-y-4">
+          <div>
+            <label for="rfidTag" class="block text-sm font-medium text-gray-700 mb-1">RFID Tag</label>
+            <input type="text" id="rfidTag" name="rfidTag" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          
+          <div>
+            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select id="status" name="status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="Unclaimed">Unclaimed</option>
+              <option value="Claimed">Claimed</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+            <input type="file" id="image" name="image" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="imagePreviewContainer" class="mt-2 hidden">
+              <img id="imagePreview" class="h-32 object-contain" src="">
+            </div>
+          </div>
+          
+          <div>
+            <label for="owner" class="block text-sm font-medium text-gray-700 mb-1">Owner (Optional)</label>
+            <select id="owner" name="owner" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">No Owner</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded transition duration-300" onclick="closeAddEditModal()">
+          Cancel
+        </button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-300">
+          Save Item
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
-  let taggedItems = []; // Store only RFID-tagged items
+  let taggedItems = [];
+  let categories = [];
+  let locations = [];
+  let users = [];
+  let currentItemId = null;
 
   document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector(".container").classList.add("loaded");
+    // Show main container with fade-in effect
+    setTimeout(() => {
+      document.getElementById("mainContainer").classList.add("opacity-100");
+    }, 100);
+    
+    // Fetch all required data
     fetchTaggedItems();
-    fetchLocations(); // Fetch and populate locations
+    fetchCategories();
+    fetchLocations();
+    fetchUsers();
+    
+    // Setup event listeners
+    document.getElementById("addItemBtn").addEventListener("click", openAddItemModal);
+    document.getElementById("itemForm").addEventListener("submit", handleItemFormSubmit);
+    document.getElementById("editItemBtn").addEventListener("click", handleEditButtonClick);
+    
+    // Image preview functionality
+    document.getElementById("image").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById("imagePreview").src = e.target.result;
+          document.getElementById("imagePreviewContainer").classList.remove("hidden");
+        }
+        reader.readAsDataURL(file);
+      }
+    });
   });
 
-
-
+  async function fetchTaggedItems() {
+    try {
+      const response = await fetch("/api/tagged-items");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch items: ${response.statusText}`);
+      }
+      const items = await response.json();
+      taggedItems = items;
+      renderItems(taggedItems);
+    } catch (error) {
+      console.error("Error fetching tagged items:", error);
+      showNotification("Failed to load items", "error");
+    }
+  }
+  
+  async function fetchCategories() {
+    try {
+      const response = await fetch("/api/categories");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.statusText}`);
+      }
+      categories = await response.json();
+      
+      // Populate category dropdown
+      const categoryDropdown = document.getElementById("category");
+      categoryDropdown.innerHTML = "";
+      
+      categories.forEach(category => {
+        if (category.status === "Active") {
+          const option = document.createElement("option");
+          option.value = category.id;
+          option.textContent = category.name;
+          categoryDropdown.appendChild(option);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }
 
   async function fetchLocations() {
     try {
@@ -374,167 +263,281 @@
       if (!response.ok) {
         throw new Error(`Failed to fetch locations: ${response.statusText}`);
       }
-      const locations = await response.json();
-      const locationDropdown = document.getElementById("location-filter");
-
-      // Clear and add default option
-      locationDropdown.innerHTML = '<option value="">📍 By Location</option>';
-
-      // Populate dropdown
-      locations.forEach((loc) => {
-        let option = document.createElement("option");
-        option.value = loc.name;
-        option.textContent = loc.name;
-        locationDropdown.appendChild(option);
+      locations = await response.json();
+      
+      // Populate location filter dropdown
+      const locationFilter = document.getElementById("location-filter");
+      locationFilter.innerHTML = '<option value="">📍 By Location</option>';
+      
+      // Populate form location dropdown
+      const locationSelect = document.getElementById("locationSelect");
+      locationSelect.innerHTML = "";
+      
+      locations.forEach(location => {
+        // For filter dropdown
+        const filterOption = document.createElement("option");
+        filterOption.value = location.name;
+        filterOption.textContent = location.name;
+        locationFilter.appendChild(filterOption);
+        
+        // For form dropdown
+        const formOption = document.createElement("option");
+        formOption.value = location.id;
+        formOption.textContent = location.name;
+        locationSelect.appendChild(formOption);
       });
-
-      locationDropdown.addEventListener("change", filterItems);
+      
+      // Add change event for filter
+      locationFilter.addEventListener("change", filterItems);
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
   }
-
-
-
-
-
-  async function fetchTaggedItems() {
-  try {
-    const response = await fetch("/api/tagged-items");
-    if (!response.ok) {
-      throw new Error(`Failed to fetch items: ${response.statusText}`);
-    }
-    const items = await response.json();
-
-    // Debugging: Log API response
-    console.log("Fetched Items from API:", items);
-
-    // Store only RFID-tagged items
-    taggedItems = items;
-
-    console.log("Filtered Tagged Items:", taggedItems); // Debugging check
-    renderItems(taggedItems); // Render only valid tagged items
-  } catch (error) {
-    console.error("Error fetching tagged items:", error);
-  }
-}
-
-
-
-
-
-
-
-
-  // Render tagged items
-  function renderItems(items) {
-  const container = document.getElementById("items-container");
-  container.innerHTML = "";
-
-  if (items.length === 0) {
-    container.innerHTML = "<p>No tagged items found.</p>";
-    return;
-  }
-
-  items.forEach((item) => {
-    const card = document.createElement("div");
-    card.classList.add("item-card");
-
-    card.innerHTML = `
-      <img src="${item.image_file ? "/uploads/" + item.image_file : "default.jpg"}" alt="Item Image">
-      <div class="item-info">
-        <p><strong>Category:</strong> ${item.category}</p>
-        <p><strong>Description:</strong> ${item.description}</p>
-        <p><strong>Location:</strong> ${item.location}</p>
-        <p><strong>Date Reported:</strong> ${item.date_reported}</p>
-        <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
-        <button class="edit-btn view-details-btn" data-item='${JSON.stringify(item)}'>
-          🔍 View Details
-        </button>
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-
-  // Attach event listeners to all "View Details" buttons
-  document.querySelectorAll(".view-details-btn").forEach((btn) => {
-  btn.addEventListener("click", function () {
-    const item = JSON.parse(this.getAttribute("data-item"));
-    openModal(item);
-  });
-});
-}
-
-
-
-
-function openModal(item) {
-    console.log("Opening modal with item:", item); // Debugging
-
-    document.getElementById("modal-title").innerText = item.category;
-    document.getElementById("modal-image").src = item.image_file
-        ? "/uploads/" + item.image_file
-        : "default.jpg";
-    document.getElementById("modal-category").innerText = item.category;
-    document.getElementById("modal-description").innerText = item.description;
-    document.getElementById("modal-location").innerText = item.location;
-    document.getElementById("modal-date").innerText = item.date_reported;
-    document.getElementById("modal-status").innerText = item.status;
-
-    // Check if owner details exist before assigning them
-    document.getElementById("modal-owner-name").innerText = item.owner_name || "N/A";
-    document.getElementById("modal-owner-email").innerText = item.owner_email || "N/A";
-    document.getElementById("modal-owner-student-id").innerText = item.owner_student_id || "N/A";
-    document.getElementById("modal-owner-contact").innerText = item.owner_contact || "N/A";
-
-    document.getElementById("itemModal").style.display = "flex";
-}
-
-
-function closeModal() {
-    document.getElementById("itemModal").style.display = "none";
-}
-
-// Attach event listeners to close buttons after the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector(".close").addEventListener("click", closeModal);
-    document.querySelector(".close-btn").addEventListener("click", closeModal);
-});
-
   
-  // Filter items based on search and status
+  async function fetchUsers() {
+    try {
+      const response = await fetch("/api/users");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.statusText}`);
+      }
+      users = await response.json();
+      
+      // Populate owners dropdown
+      const ownerDropdown = document.getElementById("owner");
+      ownerDropdown.innerHTML = '<option value="">No Owner</option>';
+      
+      users.forEach(user => {
+        const option = document.createElement("option");
+        option.value = user.id;
+        option.textContent = `${user.name} (${user.student_id})`;
+        ownerDropdown.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
+
+  function renderItems(items) {
+    const container = document.getElementById("items-container");
+    container.innerHTML = "";
+
+    if (items.length === 0) {
+      container.innerHTML = '<p class="text-gray-500 text-center p-6">No tagged items found.</p>';
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-lg shadow-md transition-transform duration-300 hover:transform hover:scale-105 overflow-hidden";
+      
+      // Status color class
+      const statusColorClass = item.status === "Claimed" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+
+      card.innerHTML = `
+        <div class="relative">
+          <img class="w-full h-48 object-cover" src="${item.image_file ? "/uploads/" + item.image_file : "/static/default-item.jpg"}" alt="${item.category} image">
+          <span class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold ${statusColorClass}">${item.status}</span>
+        </div>
+        <div class="p-4">
+          <div class="font-bold text-xl mb-1">${item.category}</div>
+          <p class="text-gray-700 text-sm mb-2 line-clamp-2">${item.description}</p>
+          <div class="text-gray-600 text-xs space-y-1">
+            <p><span class="font-medium">📍 Location:</span> ${item.location}</p>
+            <p><span class="font-medium">📅 Date:</span> ${formatDate(item.date_reported)}</p>
+            <p><span class="font-medium">🏷️ RFID:</span> ${item.rfid_tag}</p>
+          </div>
+          <button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-300 view-details-btn" data-id="${item.id}">
+            🔍 View Details
+          </button>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    // Attach event listeners to buttons
+    document.querySelectorAll(".view-details-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const itemId = this.getAttribute("data-id");
+        const item = taggedItems.find(i => i.id == itemId);
+        if (item) {
+          openDetailModal(item);
+        }
+      });
+    });
+  }
+
+  function openDetailModal(item) {
+    // Set modal data
+    document.getElementById("modal-title").textContent = item.category;
+    document.getElementById("modal-image").src = item.image_file ? "/uploads/" + item.image_file : "/static/default-item.jpg";
+    document.getElementById("modal-category").textContent = item.category;
+    document.getElementById("modal-description").textContent = item.description;
+    document.getElementById("modal-location").textContent = item.location;
+    document.getElementById("modal-date").textContent = formatDate(item.date_reported);
+    document.getElementById("modal-rfid").textContent = item.rfid_tag;
+    
+    const statusElem = document.getElementById("modal-status");
+    statusElem.textContent = item.status;
+    statusElem.className = item.status === "Claimed" 
+      ? "px-2 py-1 rounded text-sm font-medium bg-green-100 text-green-800" 
+      : "px-2 py-1 rounded text-sm font-medium bg-red-100 text-red-800";
+
+    // Owner details
+    document.getElementById("modal-owner-name").textContent = item.owner_name || "N/A";
+    document.getElementById("modal-owner-email").textContent = item.owner_email || "N/A";
+    document.getElementById("modal-owner-student-id").textContent = item.owner_student_id || "N/A";
+    document.getElementById("modal-owner-contact").textContent = item.owner_contact || "N/A";
+    
+    // Store current item ID for edit button
+    currentItemId = item.id;
+    
+    // Show modal
+    document.getElementById("itemModal").classList.remove("hidden");
+    document.getElementById("itemModal").classList.add("flex");
+  }
+
+  function closeModal() {
+    document.getElementById("itemModal").classList.remove("flex");
+    document.getElementById("itemModal").classList.add("hidden");
+  }
+  
+  function openAddItemModal() {
+    // Reset form
+    document.getElementById("itemForm").reset();
+    document.getElementById("itemId").value = "";
+    document.getElementById("addEditModalTitle").textContent = "Add Tagged Item";
+    document.getElementById("imagePreviewContainer").classList.add("hidden");
+    
+    // Open modal
+    document.getElementById("addEditItemModal").classList.remove("hidden");
+    document.getElementById("addEditItemModal").classList.add("flex");
+  }
+  
+  function handleEditButtonClick() {
+    closeModal(); // Close details modal
+    
+    // Find current item
+    const item = taggedItems.find(i => i.id == currentItemId);
+    if (!item) return;
+    
+    // Set form values
+    document.getElementById("itemId").value = item.id;
+    document.getElementById("category").value = item.category_id;
+    document.getElementById("description").value = item.description;
+    document.getElementById("locationSelect").value = item.location_id;
+    document.getElementById("date").value = item.date_reported;
+    document.getElementById("rfidTag").value = item.rfid_tag;
+    document.getElementById("status").value = item.status;
+    document.getElementById("owner").value = item.owner_id || "";
+    
+    // Show image preview if exists
+    if (item.image_file) {
+      document.getElementById("imagePreview").src = "/uploads/" + item.image_file;
+      document.getElementById("imagePreviewContainer").classList.remove("hidden");
+    }
+    
+    // Set modal title
+    document.getElementById("addEditModalTitle").textContent = "Edit Tagged Item";
+    
+    // Open modal
+    document.getElementById("addEditItemModal").classList.remove("hidden");
+    document.getElementById("addEditItemModal").classList.add("flex");
+  }
+  
+  function closeAddEditModal() {
+    document.getElementById("addEditItemModal").classList.remove("flex");
+    document.getElementById("addEditItemModal").classList.add("hidden");
+  }
+  
+  async function handleItemFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const itemId = formData.get("itemId");
+    const isEditing = itemId !== "";
+    
+    try {
+      let url = isEditing ? `/api/tagged-items/${itemId}` : "/api/tagged-items";
+      let method = isEditing ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method: method,
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save item");
+      }
+      
+      // Success
+      closeAddEditModal();
+      fetchTaggedItems(); // Refresh the item list
+      showNotification(`Item successfully ${isEditing ? "updated" : "added"}!`, "success");
+    } catch (error) {
+      console.error("Error saving item:", error);
+      showNotification(error.message, "error");
+    }
+  }
+
   function filterItems() {
     const search = document.getElementById("search").value.toLowerCase();
     const status = document.getElementById("filter-status").value;
     const location = document.getElementById("location-filter").value;
     const dateFilter = document.getElementById("date-filter").value;
 
-    let filteredItems = taggedItems.filter((item) => {
-      return (
-        (search === "" ||
-          item.description.toLowerCase().includes(search) ||
-          item.category.toLowerCase().includes(search) ||
-          item.location.toLowerCase().includes(search) ||
-          item.rfid_tag.toLowerCase().includes(search)) &&
-        (status === "" || item.status === status) &&
-        (location === "" || item.location === location)
-      );
+    let filteredItems = taggedItems.filter(item => {
+      return (search === "" ||
+              item.description.toLowerCase().includes(search) ||
+              item.category.toLowerCase().includes(search) ||
+              item.location.toLowerCase().includes(search) ||
+              item.rfid_tag.toLowerCase().includes(search)) &&
+             (status === "" || item.status === status) &&
+             (location === "" || item.location === location);
     });
 
     // Sort items by date if selected
     if (dateFilter === "Newest") {
-      filteredItems.sort(
-        (a, b) => new Date(b.date_reported) - new Date(a.date_reported)
-      );
+      filteredItems.sort((a, b) => new Date(b.date_reported) - new Date(a.date_reported));
     } else if (dateFilter === "Oldest") {
-      filteredItems.sort(
-        (a, b) => new Date(a.date_reported) - new Date(b.date_reported)
-      );
+      filteredItems.sort((a, b) => new Date(a.date_reported) - new Date(b.date_reported));
     }
 
     renderItems(filteredItems);
   }
+  
+  function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+  
+  function showNotification(message, type = "info") {
+    // You can implement a notification system here
+    alert(message);
+  }
 </script>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .max-h-90vh {
+    max-height: 90vh;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
 
 {% endblock %}

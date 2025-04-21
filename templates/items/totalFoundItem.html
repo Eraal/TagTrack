@@ -1,246 +1,98 @@
-{% extends 'base.html' %} {% block title %}Total Found Items{% endblock %} {%
-block content %}
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-  }
-
-  .container {
-    max-width: 95%;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s ease-in;
-  }
-
-  .container.loaded {
-    opacity: 1;
-  }
-
-  .header-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .counter_item {
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-
-  .header h2 {
-    font-size: 24px;
-    margin: 0;
-  }
-
-  .counter {
-    background: #11004e;
-    padding: 10px 15px;
-    border-radius: 5px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-  }
-
-  .filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-
-  .filters select,
-  .filters input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 150px;
-    background: white;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  th,
-  td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-  }
-
-  thead {
-    background: #11004e;
-    color: white;
-  }
-
-  tbody tr:nth-child(even) {
-    background: #e9e9e9;
-  }
-
-  .status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    display: inline-block;
-    min-width: 90px;
-    text-align: center;
-  }
-
-  .status.claimed {
-    background-color: #28a745;
-    color: white;
-  }
-
-  .tag-btn {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 20px;
-  }
-
-  .tag-btn:hover {
-    opacity: 0.7;
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 15px;
-  }
-
-  .pagination button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    background: #979797;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .pagination button:hover {
-    background: #11004e;
-  }
-
-  .page-title {
-    margin: auto;
-    margin-left: 50px;
-    font-weight: lighter;
-  }
-</style>
-
-<div class="header">
-  <h2>Found Items</h2>
-  <h2>Admin</h2>
+{% extends 'base.html' %} 
+{% block title %}Total Found Items{% endblock %} 
+{% block content %}
+<div class="px-6 py-4 border-b border-gray-200 bg-white shadow-sm">
+  <h2 class="text-2xl font-bold">Found Items</h2>
+  <h2 class="text-lg text-gray-600">Items / List Found Items</h2>
 </div>
 
-<h3 class="page-title"><i>Items / Total Found Item</i></h3>
 
-<div class="container">
-  <div class="counter_item">
-    <div class="header-title">
-      <h2>Total Found Items:</h2>
-      <div class="counter">
-        <span>{{ total_found_items_count }}</span>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6 transform transition-opacity duration-300 opacity-100">
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center gap-3">
+        <h2 class="text-xl font-semibold text-gray-800">Total Found Items:</h2>
+        <div class="bg-indigo-900 text-white px-4 py-2 rounded-md font-bold">
+          <span>{{ total_found_items_count }}</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <input
-      type="text"
-      id="search"
-      placeholder="Search items..."
-      onkeyup="filterItems()"
-    />
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <input
+        type="text"
+        id="search"
+        placeholder="Search items..."
+        class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      />
 
-    <select id="category-filter" onchange="filterItems()">
-      <option value=""> 📂 Category</option>
-      {% for category in categories %}
-      <option value="{{ category }}">{{ category }}</option>
-      {% endfor %}
-    </select>
+      <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        <option value=""> 📂 Category</option>
+        {% for category in categories %}
+        <option value="{{ category }}">{{ category }}</option>
+        {% endfor %}
+      </select>
 
-    <select id="tag-filter" onchange="filterItems()">
-      <option value="">Filter by Tag</option>
-      <option value="Tagged">🟢 Tagged</option>
-      <option value="Not Tagged"> 🔴 None</option>
-    </select>
-  </div>
+      <select id="tag-filter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        <option value="">Filter by Tag</option>
+        <option value="Tagged">🟢 Tagged</option>
+        <option value="Not Tagged"> 🔴 None</option>
+      </select>
+    </div>
 
-  <!-- Table Section -->
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Category</th>
-        <th>Description</th>
-        <th>Status</th>
-        <th>Date Claimed</th>
-        <th>Date Found</th>
-        <th>Tag</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in found_items %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td>{{ item.category }}</td>
-        <td>{{ item.description or 'N/A' }}</td>
-        <td>
-          <span class="status claimed"> {{ item.status }} </span>
-        </td>
-        <td>
-          {{ item.date_claimed.strftime('%m/%d/%Y') if item.date_claimed else
-          'N/A' }}
-        </td>
-        <td>{{ item.date_found.strftime('%m/%d/%Y') }}</td>
+    <!-- Table Section -->
+    <div class="overflow-x-auto">
+      <table class="w-full rounded-lg overflow-hidden">
+        <thead class="bg-indigo-900 text-white">
+          <tr>
+            <th class="py-3 px-4 text-center">#</th>
+            <th class="py-3 px-4 text-center">Category</th>
+            <th class="py-3 px-4 text-center">Description</th>
+            <th class="py-3 px-4 text-center">Status</th>
+            <th class="py-3 px-4 text-center">Date Claimed</th>
+            <th class="py-3 px-4 text-center">Date Found</th>
+            <th class="py-3 px-4 text-center">Tag</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in found_items %}
+          <tr class="{% if loop.index % 2 == 0 %}bg-gray-100{% else %}bg-white{% endif %} border-b border-gray-200 hover:bg-gray-50 transition-colors">
+            <td class="py-3 px-4 text-center">{{ loop.index }}</td>
+            <td class="py-3 px-4 text-center">{{ item.category }}</td>
+            <td class="py-3 px-4 text-center">{{ item.description or 'N/A' }}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="inline-block px-3 py-1 bg-green-500 text-white font-medium rounded-md min-w-24">
+                {{ item.status }}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              {{ item.date_claimed.strftime('%m/%d/%Y') if item.date_claimed else 'N/A' }}
+            </td>
+            <td class="py-3 px-4 text-center">{{ item.date_found.strftime('%m/%d/%Y') }}</td>
+            <td class="py-3 px-4 text-center">
+              <button class="text-xl focus:outline-none hover:opacity-70 transition-opacity">
+                {% if item.rfid_tag %}🟢{% else %}🔴{% endif %}
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-        <td>
-          <button class="tag-btn">
-            {% if item.rfid_tag %}🟢{% else %}🔴{% endif %}
-          </button>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <!-- Pagination -->
-  <div class="pagination">
-    <button>←</button>
-    <span>Page 1 of {{ total_pages }}</span>
-    <button>→</button>
+    <!-- Pagination -->
+    <div class="flex justify-center items-center gap-3 mt-6">
+      <button class="px-4 py-2 bg-gray-500 hover:bg-indigo-900 text-white rounded-md transition-colors">←</button>
+      <span class="text-gray-700">Page 1 of {{ total_pages }}</span>
+      <button class="px-4 py-2 bg-gray-500 hover:bg-indigo-900 text-white rounded-md transition-colors">→</button>
+    </div>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector(".container").classList.add("loaded");
-  });
-
   function filterItems() {
-    let searchValue = document
-      .getElementById("search")
-      .value.toLowerCase()
-      .trim();
+    let searchValue = document.getElementById("search").value.toLowerCase().trim();
     let categoryValue = document.getElementById("category-filter").value;
     let tagValue = document.getElementById("tag-filter").value;
 
@@ -263,10 +115,12 @@ block content %}
     });
   }
 
-   // Attach event listeners for real-time filtering
-   document.getElementById("search").addEventListener("keyup", filterItems);
-  document.getElementById("category-filter").addEventListener("change", filterItems);
-  document.getElementById("tag-filter").addEventListener("change", filterItems);
+  // Attach event listeners for real-time filtering
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("search").addEventListener("keyup", filterItems);
+    document.getElementById("category-filter").addEventListener("change", filterItems);
+    document.getElementById("tag-filter").addEventListener("change", filterItems);
+  });
 </script>
 
 {% endblock %}
