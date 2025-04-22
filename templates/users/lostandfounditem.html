@@ -1,0 +1,336 @@
+{% extends 'userbase.html' %}
+
+{% block content %}
+<main class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Hero section -->
+    <section class="mb-8">
+        <div class="bg-gradient-to-r from-purple-900 to-indigo-800 rounded-lg shadow-lg p-8 text-white">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-3">Lost & Found Items</h1>
+                    <p class="text-lg opacity-90">Found something or looking for a lost item? Browse our collection or use the filters to narrow down your search.</p>
+                </div>
+                <div class="w-full md:w-1/3">
+                    <form id="searchForm" action="{{ url_for('lostandfound') }}" method="GET" class="relative">
+                        <input type="text" id="searchInput" name="search" placeholder="Search for items..." 
+                            class="w-full px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="absolute right-3 top-3 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter section -->
+    <section class="mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="font-medium text-gray-700">Filter by:</div>
+                
+                <div class="filter-dropdown relative">
+                    <button type="button" class="filter-btn flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                        <i class="fas fa-tags text-purple-800"></i>
+                        <span>Category</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="filter-menu hidden absolute z-10 mt-2 bg-white rounded-lg shadow-lg p-3 w-48">
+                        <div class="py-1">
+                            <a href="{{ url_for('lostandfound') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">All Categories</a>
+                            {% for category in categories %}
+                            <a href="{{ url_for('lostandfound', category=category.id) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">{{ category.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown relative">
+                    <button type="button" class="filter-btn flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                        <i class="fas fa-map-marker-alt text-purple-800"></i>
+                        <span>Location</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="filter-menu hidden absolute z-10 mt-2 bg-white rounded-lg shadow-lg p-3 w-48">
+                        <div class="py-1">
+                            <a href="{{ url_for('lostandfound') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">All Locations</a>
+                            {% for location in locations %}
+                            <a href="{{ url_for('lostandfound', location=location.id) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">{{ location.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown relative">
+                    <button type="button" class="filter-btn flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                        <i class="fas fa-calendar-alt text-purple-800"></i>
+                        <span>Date</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="filter-menu hidden absolute z-10 mt-2 bg-white rounded-lg shadow-lg p-3 w-48">
+                        <div class="py-1">
+                            <a href="{{ url_for('lostandfound') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">All Time</a>
+                            <a href="{{ url_for('lostandfound', date='today') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">Today</a>
+                            <a href="{{ url_for('lostandfound', date='week') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">This Week</a>
+                            <a href="{{ url_for('lostandfound', date='month') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">This Month</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown relative">
+                    <button type="button" class="filter-btn flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                        <i class="fas fa-tag text-purple-800"></i>
+                        <span>Status</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="filter-menu hidden absolute z-10 mt-2 bg-white rounded-lg shadow-lg p-3 w-48">
+                        <div class="py-1">
+                            <a href="{{ url_for('lostandfound') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">All Status</a>
+                            <a href="{{ url_for('lostandfound', has_rfid='yes') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">RFID Tagged</a>
+                            <a href="{{ url_for('lostandfound', status='Claimed') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">Claimed</a>
+                            <a href="{{ url_for('lostandfound', status='Unclaimed') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 rounded">Unclaimed</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('lostandfound') }}" id="clearFilters" class="ml-auto px-4 py-2 text-purple-800 hover:text-purple-600 transition">
+                    <i class="fas fa-times mr-1"></i>Clear Filters
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Items section -->
+    <section>
+        <!-- No items found state -->
+        {% if not items %}
+        <div class="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow text-center">
+            <div class="text-gray-400 mb-4">
+                <i class="fas fa-search fa-3x"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-700 mb-2">No items found</h3>
+            <p class="text-gray-500 max-w-md mx-auto">No items match your current search criteria. Try adjusting your filters or search terms.</p>
+        </div>
+        {% else %}
+        <!-- Items grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for item in items %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:shadow-lg hover:-translate-y-1 item-card">
+                <div class="relative aspect-video bg-gray-200 overflow-hidden">
+                    {% if item.image_file %}
+                    <img src="{{ url_for('uploaded_file', filename=item.image_file) }}" alt="{{ item.description }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/placeholder.jpg') }}';">
+                    {% else %}
+                    <div class="flex items-center justify-center h-full bg-gray-300">
+                        <i class="fas fa-image text-gray-400 text-4xl"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Status badges -->
+                    <div class="absolute top-3 right-3 flex flex-col gap-1">
+                        {% if item.rfid_tag and item.rfid_tag != 'None' and item.rfid_tag != '' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-microchip mr-1"></i> RFID Tagged
+                        </span>
+                        {% endif %}
+                        
+                        {% if item.status == 'Claimed' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-hand-holding mr-1"></i> Claimed
+                        </span>
+                        {% elif item.status == 'Unclaimed' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-clock mr-1"></i> Unclaimed
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <h3 class="font-medium text-gray-900 mb-1 truncate">{{ item.description }}</h3>
+                    <div class="text-sm text-gray-500 mb-3">
+                        <p><i class="fas fa-map-marker-alt mr-1"></i> Found at {{ item.location.name }}</p>
+                        <p><i class="fas fa-calendar-alt mr-1"></i> {{ item.date_reported.strftime('%b %d, %Y') }}</p>
+                        
+                        <!-- Owner information for claimed items -->
+                        {% if item.status == 'Claimed' and item.owner %}
+                        <p class="mt-1 text-blue-700">
+                            <i class="fas fa-user mr-1"></i> Claimed by: {{ item.owner.name }}
+                        </p>
+                        {% endif %}
+                        
+                        <!-- RFID Tag information -->
+                        {% if item.rfid_tag and item.rfid_tag != 'None' and item.rfid_tag != '' %}
+                        <p class="mt-1 text-green-700">
+                            <i class="fas fa-microchip mr-1"></i> RFID Tag: {{ item.rfid_tag }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-700">
+                            {{ item.category.name }}
+                        </span>
+                        
+                        {% if item.status == 'Unclaimed' %}
+                        <button class="info-btn text-sm px-3 py-1 bg-purple-800 text-white rounded-lg hover:bg-purple-700 transition" 
+                                data-item-id="{{ item.id }}">
+                            How to Claim
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+</main>
+
+<!-- How to Claim Modal -->
+<div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">How to Claim This Item</h3>
+            <button id="closeInfoModal" class="text-gray-400 hover:text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="mb-4">
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100 mb-4">
+                <h4 class="font-medium text-blue-800 mb-2">Instructions for Claiming Lost Items:</h4>
+                <ol class="list-decimal pl-5 text-sm text-blue-700 space-y-1">
+                    <li>Visit the Lost and Found office in the Student Center building.</li>
+                    <li>Bring your student ID or other valid identification.</li>
+                    <li>Be prepared to describe the item in detail and provide proof of ownership.</li>
+                    <li>Office hours: Monday-Friday, 9:00 AM - 4:00 PM</li>
+                </ol>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-2">
+                <i class="fas fa-info-circle text-blue-600 mr-1"></i>
+                For quick service, please note down the item's details:
+            </p>
+            
+            <div id="itemDetails" class="p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+                <!-- Item details will be dynamically inserted here -->
+            </div>
+        </div>
+        
+        <div class="flex justify-end">
+            <button type="button" id="closeInfoBtn" class="px-4 py-2 text-sm font-medium text-white bg-purple-800 hover:bg-purple-700 rounded-md">
+                I Understand
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome from CDN if not already in userbase.html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+<!-- JavaScript for interactivity -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show/hide filter dropdowns
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get the dropdown menu
+                const menu = this.closest('.filter-dropdown').querySelector('.filter-menu');
+                
+                // Close all other menus
+                document.querySelectorAll('.filter-menu').forEach(m => {
+                    if (m !== menu) {
+                        m.classList.add('hidden');
+                    }
+                });
+                
+                // Toggle current menu
+                menu.classList.toggle('hidden');
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.filter-dropdown')) {
+                document.querySelectorAll('.filter-menu').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
+        // Info button functionality
+        const infoButtons = document.querySelectorAll('.info-btn');
+        const infoModal = document.getElementById('infoModal');
+        const closeInfoModal = document.getElementById('closeInfoModal');
+        const closeInfoBtn = document.getElementById('closeInfoBtn');
+        const itemDetailsContainer = document.getElementById('itemDetails');
+        
+        // Item details cache for quick lookup
+        const itemDetails = {
+            {% for item in items %}
+            "{{ item.id }}": {
+                description: "{{ item.description }}",
+                category: "{{ item.category.name }}",
+                location: "{{ item.location.name }}",
+                date: "{{ item.date_reported.strftime('%b %d, %Y') }}",
+                rfid: "{{ item.rfid_tag or 'None' }}"
+            },
+            {% endfor %}
+        };
+        
+        infoButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                const item = itemDetails[itemId];
+                
+                if (item) {
+                    // Format and display item details
+                    itemDetailsContainer.innerHTML = `
+                        <p><strong>Description:</strong> ${item.description}</p>
+                        <p><strong>Category:</strong> ${item.category}</p>
+                        <p><strong>Location Found:</strong> ${item.location}</p>
+                        <p><strong>Date Found:</strong> ${item.date}</p>
+                        ${item.rfid !== 'None' ? `<p><strong>RFID Tag:</strong> ${item.rfid}</p>` : ''}
+                        <p class="mt-2 text-purple-700"><strong>Item ID:</strong> ${itemId} <span class="text-xs text-gray-500">(Mention this ID when visiting the office)</span></p>
+                    `;
+                }
+                
+                infoModal.classList.remove('hidden');
+            });
+        });
+
+        // Close info modal
+        if (closeInfoModal) {
+            closeInfoModal.addEventListener('click', function() {
+                infoModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeInfoBtn) {
+            closeInfoBtn.addEventListener('click', function() {
+                infoModal.classList.add('hidden');
+            });
+        }
+    });
+</script>
+
+<style>
+    .item-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filter-menu {
+        min-width: 160px;
+        z-index: 20;
+    }
+</style>
+{% endblock %}

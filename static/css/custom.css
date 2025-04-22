@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Custom base styles */
+:root {
+  --primary-color: #1E1550;
+  --primary-light: #322980;
+  --accent-green: #2E7D32;
+  --accent-red: #C62828;
+  --accent-yellow: #F9A825;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Animations */
+.fadeIn {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card hover effects */
+.item-card {
+  transition: all 0.3s ease;
+}
+
+.item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom status colors */
+.status-found {
+  background-color: var(--accent-green);
+}
+
+.status-lost {
+  background-color: var(--accent-red);
+}
+
+.status-unclaimed {
+  background-color: var(--accent-yellow);
+}
+
+/* Filter dropdown animation */
+.filter-menu {
+  transform-origin: top;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+  transform: scaleY(0);
+}
+
+.filter-menu.show {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}

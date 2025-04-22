@@ -5,7 +5,7 @@ from models import Item, Category, Location
 import os
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
-from models import db, Item, Claim, Category
+from models import db, Item, Claim, Category, Location, User
 from collections import defaultdict
 
 
@@ -663,6 +663,73 @@ def total_found_items():
         found_items=found_items,
         total_found_items_count=len(found_items),
         categories=categories
+    )
+
+############################################################ USER ################################################
+
+@app.route('/users/landingpage')
+def landingpage():
+    return render_template('users/landingpage.html')
+
+@app.route('/users/lostandfounditem')
+def lostandfound():
+    # Get filter parameters
+    category_id = request.args.get('category', type=int)
+    location_id = request.args.get('location', type=int)
+    status = request.args.get('status')
+    date_filter = request.args.get('date')
+    search = request.args.get('search')
+    has_rfid = request.args.get('has_rfid')
+    
+    # Base query
+    query = Item.query
+    
+    # Apply filters
+    if category_id:
+        query = query.filter(Item.category_id == category_id)
+    
+    if location_id:
+        query = query.filter(Item.location_id == location_id)
+    
+    if status:
+        query = query.filter(Item.status == status)
+    
+    if search:
+        query = query.filter(Item.description.ilike(f'%{search}%'))
+    
+    # Filter by RFID tag presence
+    if has_rfid == 'yes':
+        query = query.filter(Item.rfid_tag.isnot(None))
+        query = query.filter(Item.rfid_tag != '')
+    
+    # Date filter
+    today = datetime.now().date()
+    if date_filter == 'today':
+        query = query.filter(Item.date_reported == today)
+    elif date_filter == 'week':
+        # Calculate the date 7 days ago
+        week_ago = today - timedelta(days=7)
+        query = query.filter(Item.date_reported >= week_ago)
+    elif date_filter == 'month':
+        # Calculate the date 30 days ago
+        month_ago = today - timedelta(days=30)
+        query = query.filter(Item.date_reported >= month_ago)
+    
+    # Execute query to get the filtered items
+    items = query.order_by(Item.date_reported.desc()).all()
+    
+    # Print debug information
+    print(f"Query returned {len(items)} items")
+    
+    # Get all categories and locations for filters
+    categories = Category.query.filter_by(status="Active").all()
+    locations = Location.query.all()
+    
+    return render_template(
+        'users/lostandfounditem.html', 
+        items=items,
+        categories=categories,
+        locations=locations
     )
 
 

@@ -1,0 +1,359 @@
+{% extends "userbase.html" %} {% block content %}
+<!-- Hero Section -->
+<section
+  class="bg-gradient-to-r from-primary to-primary-light text-white relative overflow-hidden"
+>
+  <div class="absolute inset-0 overflow-hidden">
+    <div
+      class="absolute inset-0 bg-cover bg-center opacity-20"
+      style="
+        background-image: url('{{ url_for('static', filename='images/backgroundlanding.png') }}');
+      "
+    ></div>
+  </div>
+  <div class="container mx-auto px-4 py-24 relative z-10">
+    <div class="flex flex-col md:flex-row items-center">
+      <div class="md:w-1/2 mb-10 md:mb-0">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          <span class="block">WELCOME TO</span>
+          <span class="text-accent">TAG</span
+          ><span class="text-secondary">TRACK</span>
+        </h1>
+        <p class="text-lg md:text-xl mb-8 max-w-lg">
+          Finding or losing an item on campus can be stressful, but with
+          TagTrack, reconnecting with lost items has never been easier. Our
+          platform allows you to quickly report, search, and claim lost
+          belongings, making campus life more organized and worry-free.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a
+            href="/users/lostandfounditem"
+            class="bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all pulse-button flex items-center"
+          >
+            <i class="fas fa-search mr-2"></i> FIND ITEM
+          </a>
+          <a
+            href="/report-lost"
+            class="bg-white hover:bg-gray-100 text-primary font-bold py-3 px-8 rounded-lg shadow-lg transition-all flex items-center"
+          >
+            <i class="fas fa-exclamation-circle mr-2"></i> REPORT LOST
+          </a>
+        </div>
+      </div>
+      <div class="md:w-1/2 flex justify-center">
+        <div class="relative">
+          <div
+            class="w-64 h-64 md:w-80 md:h-80 bg-white bg-opacity-10 rounded-full absolute -top-10 -right-10 animate-pulse"
+          ></div>
+          <img
+          img src="{{ url_for('static', filename='images/schoollogo.png') }}" alt="Polytechnic University Logo"
+            class="w-full max-w-md relative z-10 drop-shadow-2xl"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+      <path
+        fill="#f3f4f6"
+        fill-opacity="1"
+        d="M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,218.7C960,224,1056,192,1152,165.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+      ></path>
+    </svg>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-primary">How TagTrack Works</h2>
+      <p class="text-lg text-gray-600 mt-2">
+        Simple steps to find your lost items
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div
+        class="bg-white p-6 rounded-lg shadow-lg text-center transform transition hover:-translate-y-2"
+      >
+        <div
+          class="bg-primary-light inline-block p-4 rounded-full text-white mb-4"
+        >
+          <i class="fas fa-tag text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-primary mb-2">Tag Your Items</h3>
+        <p class="text-gray-600">
+          Get your free RFID tag and attach it to your valuable belongings to
+          ensure they can be tracked if lost.
+        </p>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-lg text-center transform transition hover:-translate-y-2"
+      >
+        <div class="bg-secondary inline-block p-4 rounded-full text-white mb-4">
+          <i class="fas fa-search text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-primary mb-2">Report If Lost</h3>
+        <p class="text-gray-600">
+          Report your lost item through our platform and receive notifications
+          when it's found.
+        </p>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-lg text-center transform transition hover:-translate-y-2"
+      >
+        <div class="bg-accent inline-block p-4 rounded-full text-white mb-4">
+          <i class="fas fa-hand-holding text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-primary mb-2">Claim & Retrieve</h3>
+        <p class="text-gray-600">
+          Once found, verify your ownership and collect your item from the
+          designated pickup point.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+      <div class="p-6">
+        <div class="text-4xl font-bold text-primary mb-2">
+          <span class="counter">95</span>%
+        </div>
+        <p class="text-gray-600">Return Rate</p>
+      </div>
+
+      <div class="p-6">
+        <div class="text-4xl font-bold text-primary mb-2">
+          <span class="counter">1500</span>+
+        </div>
+        <p class="text-gray-600">Items Returned</p>
+      </div>
+
+      <div class="p-6">
+        <div class="text-4xl font-bold text-primary mb-2">
+          <span class="counter">2000</span>+
+        </div>
+        <p class="text-gray-600">Active Users</p>
+      </div>
+
+      <div class="p-6">
+        <div class="text-4xl font-bold text-primary mb-2">
+          <span class="counter">24</span>h
+        </div>
+        <p class="text-gray-600">Average Return Time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Item Categories -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-primary">Common Lost Items</h2>
+      <p class="text-lg text-gray-600 mt-2">
+        Popular categories of items found on campus
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div
+        class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-all"
+      >
+        <div class="text-primary text-4xl mb-4">
+          <i class="fas fa-laptop"></i>
+        </div>
+        <h3 class="font-semibold text-lg">Electronics</h3>
+        <p class="text-gray-600 text-sm mt-2">
+          Laptops, phones, chargers, and other devices
+        </p>
+      </div>
+
+      <div
+        class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-all"
+      >
+        <div class="text-primary text-4xl mb-4">
+          <i class="fas fa-key"></i>
+        </div>
+        <h3 class="font-semibold text-lg">Keys</h3>
+        <p class="text-gray-600 text-sm mt-2">
+          Room keys, car keys, and keychains
+        </p>
+      </div>
+
+      <div
+        class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-all"
+      >
+        <div class="text-primary text-4xl mb-4">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <h3 class="font-semibold text-lg">Wallets & IDs</h3>
+        <p class="text-gray-600 text-sm mt-2">
+          Student IDs, wallets, and cards
+        </p>
+      </div>
+
+      <div
+        class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-all"
+      >
+        <div class="text-primary text-4xl mb-4">
+          <i class="fas fa-tshirt"></i>
+        </div>
+        <h3 class="font-semibold text-lg">Clothing</h3>
+        <p class="text-gray-600 text-sm mt-2">
+          Jackets, hats, scarves, and other apparel
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-primary">What Students Say</h2>
+      <p class="text-lg text-gray-600 mt-2">Experiences from our users</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-gray-50 p-6 rounded-lg shadow-md relative">
+        <div class="text-secondary text-4xl absolute -top-5 left-6">
+          <i class="fas fa-quote-left"></i>
+        </div>
+        <p class="text-gray-600 mt-4 mb-6">
+          TagTrack saved my semester! I lost my laptop in the library, and
+          within hours, I got a notification that it was found. The process was
+          so smooth!
+        </p>
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold"
+          >
+            MJ
+          </div>
+          <div class="ml-3">
+            <h4 class="font-bold text-primary">Danna Rosales</h4>
+            <p class="text-gray-500 text-sm">Network Administration Major</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 p-6 rounded-lg shadow-md relative">
+        <div class="text-secondary text-4xl absolute -top-5 left-6">
+          <i class="fas fa-quote-left"></i>
+        </div>
+        <p class="text-gray-600 mt-4 mb-6">
+          I was so stressed when I lost my wallet with all my IDs. Thanks to the
+          TagTrack system, it was returned to me the next day. So grateful!
+        </p>
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-accent rounded-full flex items-center justify-center text-white font-bold"
+          >
+            SR
+          </div>
+          <div class="ml-3">
+            <h4 class="font-bold text-primary">Gerald Pandaan</h4>
+            <p class="text-gray-500 text-sm">Business Administration</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 p-6 rounded-lg shadow-md relative">
+        <div class="text-secondary text-4xl absolute -top-5 left-6">
+          <i class="fas fa-quote-left"></i>
+        </div>
+        <p class="text-gray-600 mt-4 mb-6">
+          The RFID tags are so convenient! I attached one to my backpack, and
+          when I accidentally left it in the cafeteria, I got an alert
+          immediately.
+        </p>
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white font-bold"
+          >
+            DT
+          </div>
+          <div class="ml-3">
+            <h4 class="font-bold text-primary">Mae Belle Dimaano</h4>
+            <p class="text-gray-500 text-sm">Engineering Student</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section
+  class="py-16 bg-gradient-to-r from-primary to-primary-light text-white"
+>
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold mb-6">
+      Start Finding What You've Lost Today
+    </h2>
+    <p class="text-lg mb-8 max-w-xl mx-auto">
+      Join thousands of students who have already discovered the peace of mind
+      that comes with TagTrack. Never worry about losing your belongings again.
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a
+        href="/register"
+        class="bg-white text-primary hover:bg-gray-100 font-bold py-3 px-8 rounded-lg shadow-lg transition-all"
+      >
+        Sign Up Now
+      </a>
+      <a
+        href="/about-us"
+        class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary font-bold py-3 px-8 rounded-lg shadow-lg transition-all"
+      >
+        Learn More
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Tagline Banner -->
+<section class="py-8 bg-secondary text-white text-center">
+  <div class="container mx-auto px-4">
+    <p class="text-xl font-semibold">
+      "Track it, Tag it, Find it – TagTrack keeps your campus connected"
+    </p>
+  </div>
+</section>
+
+<script>
+  // Simple counter animation
+  document.addEventListener("DOMContentLoaded", () => {
+    const counters = document.querySelectorAll(".counter");
+    const speed = 200;
+
+    counters.forEach((counter) => {
+      const animate = () => {
+        const target =
+          +counter.getAttribute("data-target") || +counter.innerText;
+        const count = +counter.innerText.match(/\d+/)[0];
+        const increment = target / speed;
+
+        if (count < target) {
+          counter.innerText = Math.ceil(count + increment);
+          setTimeout(animate, 1);
+        } else {
+          counter.innerText = target;
+        }
+      };
+
+      animate();
+    });
+  });
+</script>
+{% endblock %}
