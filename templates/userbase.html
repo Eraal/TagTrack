@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TagTrack - Smart Campus Lost and Found</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/customs.css') }}"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#1e1b4b", // Deep navy blue
+                light: "#312e81",
+              },
+              secondary: {
+                DEFAULT: "#10b981", // Green
+                dark: "#047857",
+              },
+              accent: {
+                DEFAULT: "#ef4444", // Red
+                dark: "#b91c1c",
+              },
+            },
+            fontFamily: {
+              sans: ["Poppins", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+
+      .hero-section {
+        background-image: linear-gradient(
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)
+          ),
+          url("https://i.imgur.com/your-campus-image.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .pulse-button:hover {
+        animation: pulse 1.5s infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navbar -->
+    <header class="bg-primary shadow-md">
+      <nav
+        class="container mx-auto px-4 py-3 flex justify-between items-center"
+      >
+        <div class="flex items-center space-x-2">
+          <div class="text-white font-bold text-xl flex items-center">
+            <i class="fas fa-tag mr-2"></i>
+            <span>Tag<span class="text-secondary">Track</span></span>
+          </div>
+        </div>
+
+        <div class="hidden md:flex space-x-6 text-white">
+          <a
+            href="/users/landingpage"
+            class="hover:text-secondary transition-all flex items-center"
+          >
+            <i class="fas fa-home mr-1"></i> Home
+          </a>
+          <a
+            href="/users/lostandfounditem"
+            class="hover:text-secondary transition-all flex items-center"
+          >
+            <i class="fas fa-search mr-1"></i> Lost and Found
+          </a>
+          <a
+            href="/about-us"
+            class="hover:text-secondary transition-all flex items-center"
+          >
+            <i class="fas fa-info-circle mr-1"></i> About Us
+          </a>
+        </div>
+
+        <div class="hidden md:flex space-x-4">
+          <a
+            href="/login"
+            class="bg-white text-primary hover:bg-gray-100 px-4 py-2 rounded-md transition-all flex items-center"
+          >
+            <i class="fas fa-sign-in-alt mr-1"></i> Login
+          </a>
+          <a
+            href="/register"
+            class="bg-secondary text-white hover:bg-secondary-dark px-4 py-2 rounded-md transition-all flex items-center"
+          >
+            <i class="fas fa-user-plus mr-1"></i> Register
+          </a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-button" class="text-white focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="md:hidden hidden bg-primary-light">
+        <div class="px-2 pt-2 pb-3 space-y-1 text-center">
+          <a
+            href="/users/landingpage"
+            class="text-white block px-3 py-2 rounded-md hover:bg-primary"
+            >Home</a
+          >
+          <a
+            href="/lost-and-found"
+            class="text-white block px-3 py-2 rounded-md hover:bg-primary"
+            >Lost and Found</a
+          >
+          <a
+            href="/about-us"
+            class="text-white block px-3 py-2 rounded-md hover:bg-primary"
+            >About Us</a
+          >
+          <a
+            href="/login"
+            class="text-white block px-3 py-2 rounded-md hover:bg-primary"
+            >Login</a
+          >
+          <a
+            href="/register"
+            class="text-white block px-3 py-2 rounded-md hover:bg-primary"
+            >Register</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <!-- Content section (to be replaced by child templates) -->
+    <main>{% block content %}{% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white mt-20">
+      <div class="container mx-auto px-4 py-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="text-xl font-bold mb-4">TagTrack</h3>
+            <p class="text-gray-300">
+              Smart campus lost and found system that connects people with their
+              lost belongings using RFID technology.
+            </p>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+            <ul class="space-y-2">
+              <li>
+                <a href="/users/landingpage" class="text-gray-300 hover:text-secondary">Home</a>
+              </li>
+              <li>
+                <a
+                  href="/lost-and-found"
+                  class="text-gray-300 hover:text-secondary"
+                  >Lost and Found</a
+                >
+              </li>
+              <li>
+                <a href="/about-us" class="text-gray-300 hover:text-secondary"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="/contact" class="text-gray-300 hover:text-secondary"
+                  >Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-4">Connect With Us</h3>
+            <div class="flex space-x-4 mb-4">
+              <a href="#" class="text-white hover:text-secondary"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="text-white hover:text-secondary"
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a href="#" class="text-white hover:text-secondary"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" class="text-white hover:text-secondary"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+            <p class="text-gray-300">Email: contact@tagtrack.edu</p>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-300"
+        >
+          <p>&copy; 2025 TagTrack. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>
